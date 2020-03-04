@@ -246,12 +246,15 @@ def prepare_diff_img (diff_img, shape, ROI):
 
 def show_imgs (imgs, titles, messages):
     n_img = len(imgs)
-    _ , axarr = plt.subplots(1, n_img)
+    _ , axarr = plt.subplots(n_img)
     
     for i in range (n_img):
-        axarr[i].imshow(np.reshape(imgs[i],(512,512)))
+        if i==0:
+            axarr[i].imshow(np.reshape(imgs[i],(256,1600,3)))
+        else:
+            axarr[i].imshow(np.reshape(imgs[i],(256,1600)))
         axarr[i].set_title(titles[i])
-        axarr[i].text(0, 600, messages[i])
+        axarr[i].text(0, 200, messages[i])
         axarr[i].axis('off')
 
     fig = plt.gcf()

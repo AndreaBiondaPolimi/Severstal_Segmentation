@@ -16,12 +16,9 @@ def load_dataset_v2 (img_h, img_w, batch_size, preprocess_type='None'):
     training_dir = 'Severstal_Dataset'
 
     tr = pd.read_csv(training_dir + '/train.csv')
-    print(len(tr))
     
     df_train = tr[tr['EncodedPixels'].notnull()].reset_index(drop=True)
     print(len(df_train))
-
-    print (df_train.head())
 
     def rle2mask(rle, imgshape):
         width = imgshape[0]
@@ -37,43 +34,68 @@ def load_dataset_v2 (img_h, img_w, batch_size, preprocess_type='None'):
         for index, start in enumerate(starts):
             mask[int(start):int(start+lengths[index])] = 1
             current_position += lengths[index]
+
+        mask = mask*255
             
         return np.flipud( np.rot90( mask.reshape(height, width), k=1 ) )
 
 
     
-    def keras_generator(batch_size):
-        while True:
-            x_batch = []
-            y_batch = []
-            
-            for i in range(batch_size):            
-                fn = df_train['ImageId_ClassId'].iloc[i].split('_')[0]
-                img = cv2.imread( training_dir + '\\train_images\\' +fn )
-                img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)            
-                
-                mask = rle2mask(df_train['EncodedPixels'].iloc[i], img.shape)
-                
-                img = cv2.resize(img, (1600, 256))
-                mask = cv2.resize(mask, (1600, 256))
-                
-                x_batch += [img]
-                y_batch += [mask]
-                                        
-            x_batch = np.array(x_batch)
-            y_batch = np.array(y_batch)
+    def keras_generator(imgshape=(256,1600)):
+        mask_dataset = {}
 
-            yield x_batch, np.expand_dims(y_batch, -1)
+        for i in range(len(df_train)):      
+            filename = df_train['ImageId_ClassId'].iloc[i].split('_')[0]
+            empty_mask = np.zeros(shape=(256,1600,4),dtype=np.uint8)
+            mask_dataset[filename] = empty_mask
 
+        print (len(mask_dataset))
+        #for i in range(len(df_train)):      
+        for i in range(5):      
+            filename = df_train['ImageId_ClassId'].iloc[i].split('_')[0]
+            classID = df_train['ImageId_ClassId'].iloc[i].split('_')[1]        
 
-    for x, y in keras_generator(100):
-        print(x.shape, y.shape)
-        for i in range(len(x)):
-            plt.imshow(x[i])
-            plt.show()
-            plt.imshow(np.reshape(y[i],(256,1600)))
-            plt.show()
+            mask = rle2mask(df_train['EncodedPixels'].iloc[i], imgshape)
+
+            img = mask_dataset[filename]
+            img[:,:,(int(classID)-1)] = mask
+            mask_dataset[filename] = img
+
+        """
+        for i in range(len(df_train)):    
+            filename = df_train['ImageId_ClassId'].iloc[i].split('_')[0] 
+            classID = df_train['ImageId_ClassId'].iloc[i].split('_')[1]
+            print (filename + ' ' + classID)
+
+            img = cv2.imread( training_dir + '\\train_images\\' + filename )
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB) 
+
+            util.show_imgs((img,
+                            mask_dataset[filename][:,:,0], mask_dataset[filename][:,:,1],
+                            mask_dataset[filename][:,:,2], mask_dataset[filename][:,:,3]),
+                           (filename,'1','2','3','4'),('','','','',''))
+        """
         
+        #for i in range(len(df_train)):    
+        for i in range(5):    
+            filename = df_train['ImageId_ClassId'].iloc[i].split('_')[0] 
+            classID = df_train['ImageId_ClassId'].iloc[i].split('_')[1]
+            print (filename + ' ' + classID)
+
+            cv2.imwrite("Severstal_Dataset\\train_images\\masks\\aa.png", mask_dataset[filename])
+
+
+            """
+            util.show_imgs((img,
+                            mask_dataset[filename][:,:,0], mask_dataset[filename][:,:,1],
+                            mask_dataset[filename][:,:,2], mask_dataset[filename][:,:,3]),
+                           (filename,'1','2','3','4'),('','','','',''))
+            """
+        
+                            
+        
+
+    keras_generator() 
     
     return None
 
