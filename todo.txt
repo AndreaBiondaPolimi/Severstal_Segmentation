@@ -1,0 +1,6 @@
+(1)Data Augmentation (hflip,vflip,brighth,zoom,shift)
+4)Different loss (bce, dice, dice+bce, lovasz)
+
+2)New Models (EfficientNet/FPN)
+5)Show test images
+6)Use multiple models and train in parallel

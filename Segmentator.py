@@ -11,65 +11,44 @@ from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 from tensorflow.keras import backend as K
 
 
+def get_segmentation_model (input_size = (128,800,3), pretrained_weights=None, preprocess_type = 'none'):
+    if (preprocess_type == 'resnet34'):
+        return resent34_seg_model(input_size, pretrained_weights)
+    elif (preprocess_type == 'efficientnetb4'):
+        return efficientnetb4_seg_model(input_size, pretrained_weights)
+        
 
-def get_segmentation_model (input_size = (256,1600,3)):
-    return unet_model(input_size)
-
-
-
-def unet_model(input_size, pretrained_weights=None):
-    inputs = Input(input_size)
-    conv1 = Conv2D(64, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(inputs)
-    conv1 = Conv2D(64, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(conv1)
-    pool1 = MaxPooling2D(pool_size=(2, 2))(conv1)
-    conv2 = Conv2D(128, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(pool1)
-    conv2 = Conv2D(128, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(conv2)
-    pool2 = MaxPooling2D(pool_size=(2, 2))(conv2)
-    conv3 = Conv2D(256, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(pool2)
-    conv3 = Conv2D(256, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(conv3)
-    pool3 = MaxPooling2D(pool_size=(2, 2))(conv3)
-    conv4 = Conv2D(512, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(pool3)
-    conv4 = Conv2D(512, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(conv4)
-    drop4 = Dropout(0.5)(conv4)
-    pool4 = MaxPooling2D(pool_size=(2, 2))(drop4)
-
-    conv5 = Conv2D(1024, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(pool4)
-    conv5 = Conv2D(1024, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(conv5)
-    drop5 = Dropout(0.5)(conv5)
-
-    up6 = Conv2D(512, 2, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(UpSampling2D(size = (2,2), interpolation='bilinear')(drop5))
-    merge6 = concatenate([drop4,up6], axis = 3)
-    conv6 = Conv2D(512, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(merge6)
-    conv6 = Conv2D(512, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(conv6)
-
-    up7 = Conv2D(256, 2, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(UpSampling2D(size = (2,2), interpolation='bilinear')(conv6))
-    merge7 = concatenate([conv3,up7], axis = 3)
-    conv7 = Conv2D(256, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(merge7)
-    conv7 = Conv2D(256, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(conv7)
-
-    up8 = Conv2D(128, 2, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(UpSampling2D(size = (2,2), interpolation='bilinear')(conv7))
-    merge8 = concatenate([conv2,up8], axis = 3)
-    conv8 = Conv2D(128, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(merge8)
-    conv8 = Conv2D(128, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(conv8)
-
-    up9 = Conv2D(64, 2, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(UpSampling2D(size = (2,2), interpolation='bilinear')(conv8))
-    merge9 = concatenate([conv1,up9], axis = 3)
-    conv9 = Conv2D(64, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(merge9)
-    conv9 = Conv2D(64, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(conv9)
-    conv9 = Conv2D(16, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(conv9)
-    conv10 = Conv2D(4, 1, activation = 'sigmoid')(conv9)
-
-    model = Model(inputs, conv10)
-
-    model.compile(optimizer = Adam(lr = 1e-4), loss = 'binary_crossentropy', metrics=[my_IoU])
-    #model.compile(optimizer = Adam(lr = 1e-4), loss = dice_coef_loss, metrics=[my_IoU])
+from segmentation_models import Unet
+#from segmentation_models.backbones import get_preprocessing
+def resent34_seg_model (input_size, pretrained_weights):
+    model = Unet('resnet34', encoder_weights='imagenet', input_shape=input_size, classes=4, activation='sigmoid')
     
+    #model.compile(optimizer = 'adam', loss = 'binary_crossentropy', metrics=[dice_coef])
+    model.compile(optimizer = 'adam', loss = bce_dice_loss , metrics=[dice_coef])
+
     model.summary()
 
     if(pretrained_weights):
     	model.load_weights(pretrained_weights)
 
     return model
+
+
+def efficientnetb4_seg_model (input_size, pretrained_weights):
+    model = Unet('efficientnetb4', encoder_weights='imagenet', input_shape=input_size, classes=4, activation='sigmoid')
+    
+    model.compile(optimizer = 'adam', loss = 'binary_crossentropy', metrics=[dice_coef])
+    #model.compile(optimizer = 'adam', loss = lovasz_loss , metrics=[dice_coef])
+    #model.compile(optimizer = 'adam', loss = lovasz_loss , metrics=[dice_coef])
+
+    model.summary()
+
+    if(pretrained_weights):
+    	model.load_weights(pretrained_weights)
+
+    return model
+
+
 
 
 
@@ -77,215 +56,138 @@ def train (model, train_dataset, valid_dataset, epochs):
     callbacks = []
 
     #es_callback = EarlyStopping(monitor='val_loss', patience=70)
-    checkpoint_loss = ModelCheckpoint(filepath='check_val_loss{epoch:02d}.h5', monitor='val_loss',mode='min', period=1, save_best_only=True) 
-    checkpoint_iou = ModelCheckpoint(filepath='check_val_iou{epoch:02d}.h5', monitor='val_my_IoU',mode='max', period=1, save_best_only=True) 
+    #checkpoint_loss = ModelCheckpoint(filepath='check_val_loss{epoch:02d}.h5', monitor='val_loss',mode='min', period=1, save_best_only=True) 
+    checkpoint_dice = ModelCheckpoint(filepath='check_val_dice{epoch:02d}.h5', monitor='val_dice_coef',mode='max', period=1, save_best_only=True) 
 
 
     #callbacks.append(es_callback)
-    callbacks.append(checkpoint_loss)
-    callbacks.append(checkpoint_iou)
+    #callbacks.append(checkpoint_loss)
+    callbacks.append(checkpoint_dice)
 
-
+    """
     model.fit(x=train_dataset,
           epochs=epochs,  #### set repeat in training dataset
           steps_per_epoch=300,
           validation_data=valid_dataset,
           validation_steps=200,
           callbacks=callbacks)
+    """
+
+    model.fit_generator(train_dataset, validation_data = valid_dataset, 
+                        epochs = 50, verbose=1,
+                        callbacks=callbacks)
 
     model.save('seg_final.h5')
 
 
 
 
-def my_IoU(y_true, y_pred):
-    # from pobability to predicted class {0, 1}
-    y_pred = tf.cast(y_pred > 0.5, tf.float32) # when using sigmoid. Use argmax for softmax
-
-    # A and B
-    intersection = tf.reduce_sum(y_true * y_pred)
-    # A or B
-    union = tf.reduce_sum(y_true) + tf.reduce_sum(y_pred) - intersection
-    # IoU
-    return intersection / union
 
 
-
-def dice_coef(y_true, y_pred):
-    y_pred =  K.cast(y_pred, dtype='float32')
-    y_true =  K.cast(y_true, dtype='float32')
+def dice_coef(y_true, y_pred, smooth=1):
     y_true_f = K.flatten(y_true)
     y_pred_f = K.flatten(y_pred)
     intersection = K.sum(y_true_f * y_pred_f)
-    return (2. * intersection + 1) / (K.sum(y_true_f) + K.sum(y_pred_f) + 1)
+    return (2. * intersection + smooth) / (K.sum(y_true_f) + K.sum(y_pred_f) + smooth)
 
-def dice_coef_loss(y_true, y_pred):
-    return -dice_coef(y_true, y_pred)
-
-
-
-
-# weight: weighted tensor(same shape with mask image)
-def weighted_bce_loss(y_true, y_pred, weight):
-    # avoiding overflow
-    epsilon = 1e-7
-    y_pred = K.clip(y_pred, epsilon, 1. - epsilon)
-    logit_y_pred = K.log(y_pred / (1. - y_pred))
-    
-    # https://www.tensorflow.org/api_docs/python/tf/nn/weighted_cross_entropy_with_logits
-    loss = (1. - y_true) * logit_y_pred + (1. + (weight - 1.) * y_true) * \
-    (K.log(1. + K.exp(-K.abs(logit_y_pred))) + K.maximum(-logit_y_pred, 0.))
-    return K.sum(loss) / K.sum(weight)
-
-def weighted_dice_loss(y_true, y_pred, weight):
+def dice_loss(y_true, y_pred):
     smooth = 1.
-    w, m1, m2 = weight * weight, y_true, y_pred
-    intersection = (m1 * m2)
-    score = (2. * K.sum(w * intersection) + smooth) / (K.sum(w * m1) + K.sum(w * m2) + smooth)
-    loss = 1. - K.sum(score)
+    y_true_f = K.flatten(y_true)
+    y_pred_f = K.flatten(y_pred)
+    intersection = y_true_f * y_pred_f
+    score = (2. * K.sum(intersection) + smooth) / (K.sum(y_true_f) + K.sum(y_pred_f) + smooth)
+    return 1. - score
+
+def bce_dice_loss(y_true, y_pred):
+    return tf.keras.losses.binary_crossentropy(y_true, y_pred) + dice_loss(y_true, y_pred)
+
+
+
+
+
+
+# code download from: https://github.com/bermanmaxim/LovaszSoftmax
+def lovasz_grad(gt_sorted):
+    """
+    Computes gradient of the Lovasz extension w.r.t sorted errors
+    See Alg. 1 in paper
+    """
+    gts = tf.reduce_sum(gt_sorted)
+    intersection = gts - tf.cumsum(gt_sorted)
+    union = gts + tf.cumsum(1. - gt_sorted)
+    jaccard = 1. - intersection / union
+    jaccard = tf.concat((jaccard[0:1], jaccard[1:] - jaccard[:-1]), 0)
+    return jaccard
+
+
+# --------------------------- BINARY LOSSES ---------------------------
+
+def lovasz_hinge(logits, labels, per_image=True, ignore=None):
+    """
+    Binary Lovasz hinge loss
+      logits: [B, H, W] Variable, logits at each pixel (between -\infty and +\infty)
+      labels: [B, H, W] Tensor, binary ground truth masks (0 or 1)
+      per_image: compute the loss per image instead of per batch
+      ignore: void class id
+    """
+    if per_image:
+        def treat_image(log_lab):
+            log, lab = log_lab
+            log, lab = tf.expand_dims(log, 0), tf.expand_dims(lab, 0)
+            log, lab = flatten_binary_scores(log, lab, ignore)
+            return lovasz_hinge_flat(log, lab)
+        losses = tf.map_fn(treat_image, (logits, labels), dtype=tf.float32)
+        loss = tf.reduce_mean(losses)
+    else:
+        loss = lovasz_hinge_flat(*flatten_binary_scores(logits, labels, ignore))
     return loss
 
-def weighted_bce_dice_loss(y_true, y_pred):
-    y_true = K.cast(y_true, 'float32')
-    y_pred = K.cast(y_pred, 'float32')
-    # if we want to get same size of output, kernel size must be odd number
-    averaged_mask = K.pool2d(
-            y_true, pool_size=(11, 11), strides=(1, 1), padding='same', pool_mode='avg')
-    border = K.cast(K.greater(averaged_mask, 0.005), 'float32') * K.cast(K.less(averaged_mask, 0.995), 'float32')
-    weight = K.ones_like(averaged_mask)
-    w0 = K.sum(weight)
-    weight += border * 2
-    w1 = K.sum(weight)
-    weight *= (w0 / w1)
-    loss = weighted_bce_loss(y_true, y_pred, weight) + \
-    weighted_dice_loss(y_true, y_pred, weight)
+
+def lovasz_hinge_flat(logits, labels):
+    """
+    Binary Lovasz hinge loss
+      logits: [P] Variable, logits at each prediction (between -\infty and +\infty)
+      labels: [P] Tensor, binary ground truth labels (0 or 1)
+      ignore: label to ignore
+    """
+
+    def compute_loss():
+        labelsf = tf.cast(labels, logits.dtype)
+        signs = 2. * labelsf - 1.
+        errors = 1. - logits * tf.stop_gradient(signs)
+        errors_sorted, perm = tf.nn.top_k(errors, k=tf.shape(errors)[0], name="descending_sort")
+        gt_sorted = tf.gather(labelsf, perm)
+        grad = lovasz_grad(gt_sorted)
+        loss = tf.tensordot(tf.nn.relu(errors_sorted), tf.stop_gradient(grad), 1, name="loss_non_void")
+        return loss
+
+    # deal with the void prediction case (only void pixels)
+    loss = tf.cond(tf.equal(tf.shape(logits)[0], 0),
+                   lambda: tf.reduce_sum(logits) * 0.,
+                   compute_loss,
+                   strict=True,
+                   name="loss"
+                   )
     return loss
 
 
+def flatten_binary_scores(scores, labels, ignore=None):
+    """
+    Flattens predictions in the batch (binary case)
+    Remove labels equal to 'ignore'
+    """
+    scores = tf.reshape(scores, (-1,))
+    labels = tf.reshape(labels, (-1,))
+    if ignore is None:
+        return scores, labels
+    valid = tf.not_equal(labels, ignore)
+    vscores = tf.boolean_mask(scores, valid, name='valid_scores')
+    vlabels = tf.boolean_mask(labels, valid, name='valid_labels')
+    return vscores, vlabels
 
-
-
-
-
-
-
-"""
-from tensorflow.keras.models import model_from_json
-from tensorflow.keras.applications import ResNet50
-def resent_seg_model(pretrained_weights = None, input_size = (256,256,3)):
-    model = ResNet50(input_shape=input_size, weights='imagenet', include_top=False)
-
-    x = model.output
-
-    encoder = Model(inputs=model.input, outputs=x)
-
-    skip_layer_1 = encoder.get_layer('conv1_relu').output
-    skip_layer_2 = encoder.get_layer('conv2_block3_out').output
-    skip_layer_3 = encoder.get_layer('conv3_block4_out').output
-    skip_layer_4 = encoder.get_layer('conv4_block6_out').output
-
-
-    up6 = Conv2D(1024, 2, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(UpSampling2D(size = (2,2), interpolation='bilinear')(x))
-    merge6 = concatenate([skip_layer_4 , up6], axis = 3)
-    conv6 = Conv2D(1024, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(merge6)
-    conv6 = Conv2D(1024, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(conv6)
-
-    up7 = Conv2D(512, 2, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(UpSampling2D(size = (2,2), interpolation='bilinear')(conv6))
-    merge7 = concatenate([skip_layer_3,up7], axis = 3)
-    conv7 = Conv2D(512, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(merge7)
-    conv7 = Conv2D(512, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(conv7)
-
-    up8 = Conv2D(256, 2, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(UpSampling2D(size = (2,2), interpolation='bilinear')(conv7))
-    merge8 = concatenate([skip_layer_2,up8], axis = 3)
-    conv8 = Conv2D(256, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(merge8)
-    conv8 = Conv2D(256, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(conv8)
-
-    up9 = Conv2D(128, 2, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(UpSampling2D(size = (2,2), interpolation='bilinear')(conv8))
-    merge9 = concatenate([skip_layer_1,up9], axis = 3)
-    conv9 = Conv2D(128, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(merge9)
-    conv9 = Conv2D(128, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(conv9)
-    
-    up10 = Conv2D(64, 2, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(UpSampling2D(size = (2,2), interpolation='bilinear')(conv9))
-    #merge9 = concatenate([conv1,up9], axis = 3)
-    conv10 = Conv2D(64, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(up10)
-    conv10 = Conv2D(64, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(conv10)
-    
-    
-    conv10 = Conv2D(2, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(conv10)
-    conv10 = Conv2D(1, 1, activation = 'sigmoid')(conv10)
-
-    model = Model(inputs=model.input, outputs=conv10)
-
-    #model.compile(optimizer = Adam(lr = 1e-4), loss = 'binary_crossentropy', metrics=[my_IoU])
-    model.compile(optimizer = Adam(lr = 1e-4), loss = weighted_bce_dice_loss, metrics=[my_IoU])
-
-    model.summary()
-
-    if(pretrained_weights):
-    	model.load_weights(pretrained_weights)
-
-    return model
-
-
-from tensorflow.keras.models import model_from_json
-from tensorflow.keras.applications import MobileNet
-def mobilenet_seg_model(pretrained_weights = None, input_size = (256,256,3)):
-    model = MobileNet(input_shape=input_size, weights='imagenet', include_top=False)
-
-    x = model.output
-
-    encoder = Model(inputs=model.input, outputs=x)
-
-    
-    skip_layer_1 = encoder.get_layer('conv_pw_1_relu').output
-    skip_layer_2 = encoder.get_layer('conv_pw_3_relu').output
-    skip_layer_3 = encoder.get_layer('conv_pw_5_relu').output
-    skip_layer_4 = encoder.get_layer('conv_pw_11_relu').output
-
-    up6 = Conv2D(512, 2, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(x)#(UpSampling2D(size = (2,2), interpolation='bilinear')(x))
-    up6 = Conv2DTranspose(512, 2, activation = 'relu', padding = 'same', strides=2 , kernel_initializer = 'he_normal')(up6)
-    merge6 = concatenate([skip_layer_4,up6], axis = 3)
-    conv6 = Conv2D(512, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(merge6)
-    conv6 = Conv2D(512, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(conv6)
-
-    up7 = Conv2D(256, 2, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(conv6)#(UpSampling2D(size = (2,2), interpolation='bilinear')(conv6))
-    up7 = Conv2DTranspose(256, 2, activation = 'relu', padding = 'same', strides=2 , kernel_initializer = 'he_normal')(up7)
-    merge7 = concatenate([skip_layer_3,up7], axis = 3)
-    conv7 = Conv2D(256, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(merge7)
-    conv7 = Conv2D(256, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(conv7)
-
-    up8 = Conv2D(128, 2, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(conv7)#(UpSampling2D(size = (2,2), interpolation='bilinear')(conv7))
-    up8 = Conv2DTranspose(128, 2, activation = 'relu', padding = 'same', strides=2 , kernel_initializer = 'he_normal')(up8)
-    merge8 = concatenate([skip_layer_2,up8], axis = 3)
-    conv8 = Conv2D(128, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(merge8)
-    conv8 = Conv2D(128, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(conv8)
-
-    up9 = Conv2D(64, 2, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(conv8)#(UpSampling2D(size = (2,2), interpolation='bilinear')(conv8))
-    up9 = Conv2DTranspose(64, 2, activation = 'relu', padding = 'same', strides=2 , kernel_initializer = 'he_normal')(up9)
-    merge9 = concatenate([skip_layer_1,up9], axis = 3)
-    conv9 = Conv2D(64, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(merge9)
-    conv9 = Conv2D(64, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(conv9)
-    
-    up10 = Conv2D(32, 2, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(conv9)#(UpSampling2D(size = (2,2), interpolation='bilinear')(conv9))
-    up10 = Conv2DTranspose(32, 2, activation = 'relu', padding = 'same', strides=2 , kernel_initializer = 'he_normal')(up10)
-    #merge9 = concatenate([conv1,up9], axis = 3)
-    conv10 = Conv2D(32, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(up10)
-    conv10 = Conv2D(32, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(conv10)
-    
-    conv10 = Conv2D(16, 3, activation = 'relu', padding = 'same', kernel_initializer = 'he_normal')(conv10)
-    conv10 = Conv2D(1, 1, activation = 'sigmoid')(conv10)
-
-    model = Model(inputs=model.input, outputs=conv10)
-
-    #model.compile(optimizer = Adam(lr = 1e-4), loss = 'binary_crossentropy', metrics=[my_IoU])
-    #model.compile(optimizer = Adam(lr = 1e-4), loss = dice_coef_loss, metrics=[my_IoU])
-    model.compile(optimizer = Adam(lr = 1e-4), loss = weighted_bce_dice_loss, metrics=[my_IoU])
-
-    model.summary()
-
-    if(pretrained_weights is not None):
-    	model.load_weights(pretrained_weights)
-
-    return model
-
-"""
+def lovasz_loss(y_true, y_pred):
+    y_true, y_pred = K.cast(y_true, 'int32'), K.cast(y_pred, 'float32')
+    #logits = K.log(y_pred / (1. - y_pred))
+    logits = y_pred #Jiaxin
+    loss = lovasz_hinge(logits, y_true, per_image = True, ignore = None)
+    return loss
