@@ -2,6 +2,7 @@ import numpy as np
 import os
 import numpy as np
 import tensorflow as tf
+import keras
 
 from tensorflow.keras.models import Sequential, Model
 from tensorflow.keras.layers import Conv2D, Dense, MaxPool2D, Dropout, Flatten, BatchNormalization, Activation, add, ZeroPadding2D, Conv2DTranspose
@@ -36,10 +37,12 @@ def resent34_seg_model (input_size, pretrained_weights):
 
 def efficientnetb4_seg_model (input_size, pretrained_weights):
     model = Unet('efficientnetb4', encoder_weights='imagenet', input_shape=input_size, classes=4, activation='sigmoid')
-    
-    model.compile(optimizer = 'adam', loss = 'binary_crossentropy', metrics=[dice_coef])
-    #model.compile(optimizer = 'adam', loss = lovasz_loss , metrics=[dice_coef])
-    #model.compile(optimizer = 'adam', loss = lovasz_loss , metrics=[dice_coef])
+
+
+    adam = keras.optimizers.Adam(lr=1e-4)
+    #model.compile(optimizer = 'adam', loss = 'binary_crossentropy', metrics=[dice_coef])
+    model.compile(optimizer = adam, loss = bce_dice_loss , metrics=[dice_coef])
+    #model.compile(optimizer = adam, loss = lovasz_loss , metrics=[dice_coef])
 
     model.summary()
 
@@ -64,18 +67,18 @@ def train (model, train_dataset, valid_dataset, epochs):
     #callbacks.append(checkpoint_loss)
     callbacks.append(checkpoint_dice)
 
-    """
+    
     model.fit(x=train_dataset,
           epochs=epochs,  #### set repeat in training dataset
           steps_per_epoch=300,
           validation_data=valid_dataset,
           validation_steps=200,
           callbacks=callbacks)
-    """
+    
 
-    model.fit_generator(train_dataset, validation_data = valid_dataset, 
-                        epochs = 50, verbose=1,
-                        callbacks=callbacks)
+    #model.fit_generator(train_dataset, validation_data = valid_dataset, 
+                        #epochs = 50, verbose=1,
+                        #allbacks=callbacks)
 
     model.save('seg_final.h5')
 
@@ -99,6 +102,7 @@ def dice_loss(y_true, y_pred):
     return 1. - score
 
 def bce_dice_loss(y_true, y_pred):
+    #return tf.keras.losses.binary_crossentropy(y_true, y_pred) + dice_loss(y_true, y_pred)
     return tf.keras.losses.binary_crossentropy(y_true, y_pred) + dice_loss(y_true, y_pred)
 
 
@@ -106,7 +110,6 @@ def bce_dice_loss(y_true, y_pred):
 
 
 
-# code download from: https://github.com/bermanmaxim/LovaszSoftmax
 def lovasz_grad(gt_sorted):
     """
     Computes gradient of the Lovasz extension w.r.t sorted errors
@@ -121,6 +124,7 @@ def lovasz_grad(gt_sorted):
 
 
 # --------------------------- BINARY LOSSES ---------------------------
+
 
 def lovasz_hinge(logits, labels, per_image=True, ignore=None):
     """
@@ -158,7 +162,7 @@ def lovasz_hinge_flat(logits, labels):
         errors_sorted, perm = tf.nn.top_k(errors, k=tf.shape(errors)[0], name="descending_sort")
         gt_sorted = tf.gather(labelsf, perm)
         grad = lovasz_grad(gt_sorted)
-        loss = tf.tensordot(tf.nn.relu(errors_sorted), tf.stop_gradient(grad), 1, name="loss_non_void")
+        loss = tf.tensordot(tf.nn.relu(errors_sorted), grad, 1, name="loss_non_void")
         return loss
 
     # deal with the void prediction case (only void pixels)
@@ -184,10 +188,3 @@ def flatten_binary_scores(scores, labels, ignore=None):
     vscores = tf.boolean_mask(scores, valid, name='valid_scores')
     vlabels = tf.boolean_mask(labels, valid, name='valid_labels')
     return vscores, vlabels
-
-def lovasz_loss(y_true, y_pred):
-    y_true, y_pred = K.cast(y_true, 'int32'), K.cast(y_pred, 'float32')
-    #logits = K.log(y_pred / (1. - y_pred))
-    logits = y_pred #Jiaxin
-    loss = lovasz_hinge(logits, y_true, per_image = True, ignore = None)
-    return loss

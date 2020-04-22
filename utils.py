@@ -8,9 +8,9 @@ def show_imgs (imgs, titles, messages):
     
     for i in range (n_img):
         if i==0:
-            axarr[i].imshow(np.reshape(imgs[i],(128,800,3)))
+            axarr[i].imshow(imgs[i])
         else:
-            axarr[i].imshow(np.reshape(imgs[i],(128,800)))
+            axarr[i].imshow(imgs[i])
         axarr[i].set_title(titles[i])
         axarr[i].text(0, 200, messages[i])
         axarr[i].axis('off')

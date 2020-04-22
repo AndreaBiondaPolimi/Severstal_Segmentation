@@ -9,15 +9,17 @@ from keras.preprocessing.image import apply_affine_transform
 
 path = 'Severstal_Dataset'
 train_path = 'Severstal_Dataset\\train_images\\images_all\\imgs\\'
-test_path = 'Severstal_Dataset\\test_images'
+test_path = 'Severstal_Dataset\\test_images\\'
 
 class DataGenerator(keras.utils.Sequence):
-    def __init__(self, df, batch_size = 16, subset="train", shuffle=False, 
+    def __init__(self, df, img_h = 128, img_w=1600, batch_size = 16, subset="train", shuffle=False, 
                  preprocess=None, info={},
                  rotation_range=0, width_shift_range=0, height_shift_range=0,
                  zoom_range=0, flip_h=False, flip_v=False, brightness=0, fill_mode='constant'):
         super().__init__()
         self.df = df
+        self.img_h = img_h
+        self.img_w = img_w
         self.shuffle = shuffle
         self.subset = subset
         self.batch_size = batch_size
@@ -49,15 +51,14 @@ class DataGenerator(keras.utils.Sequence):
             np.random.shuffle(self.indexes)
     
     def __getitem__(self, index): 
-        X = np.empty((self.batch_size,128,800,3),dtype=np.float32)
-        y = np.empty((self.batch_size,128,800,4),dtype=np.int8)
+        X = np.empty((self.batch_size,self.img_h,self.img_w,3),dtype=np.float32)
+        y = np.empty((self.batch_size,self.img_h,self.img_w,4),dtype=np.int8)
         indexes = self.indexes[index*self.batch_size:(index+1)*self.batch_size]
         for i,f in enumerate(self.df['ImageId'].iloc[indexes]):
             self.info[index*self.batch_size+i]=f
-            X[i,] = Image.open(self.data_path + f).resize((800,128))
-            if self.subset == 'train': 
-                for j in range(4):
-                    y[i,:,:,j] = rle2maskResize(self.df['e'+str(j+1)].iloc[indexes[i]])
+            X[i,] = Image.open(self.data_path + f).resize((self.img_w,self.img_h)) 
+            for j in range(4):
+                y[i,:,:,j] = rle2maskResize(self.df['e'+str(j+1)].iloc[indexes[i]], self.img_h, self.img_w)
         if self.preprocess!=None: 
             X = self.preprocess(X)
 
@@ -89,13 +90,13 @@ class DataGenerator(keras.utils.Sequence):
 
 
 # https://www.kaggle.com/titericz/building-and-visualizing-masks
-def rle2maskResize(rle):
+def rle2maskResize(rle, img_h, img_w):
     # CONVERT RLE TO MASK 
     if (pd.isnull(rle))|(rle==''): 
-        return np.zeros((128,800) ,dtype=np.uint8)
+        return np.zeros((img_h,img_w) ,dtype=np.uint8)
     
-    height= 256
-    width = 1600
+    height= img_h
+    width = img_w
     mask= np.zeros( width*height ,dtype=np.uint8)
 
     array = np.asarray([int(x) for x in rle.split()])
@@ -103,8 +104,11 @@ def rle2maskResize(rle):
     lengths = array[1::2]    
     for index, start in enumerate(starts):
         mask[int(start):int(start+lengths[index])] = 1
+
+    #ret = mask.reshape( (height,width), order='F' )[::2,::2]
+    ret = mask.reshape( (height,width), order='F' )
     
-    return mask.reshape( (height,width), order='F' )[::2,::2]
+    return ret
 
 def mask2contour(mask, width=3):
     # CONVERT MASK TO ITS CONTOUR
@@ -153,7 +157,7 @@ def restructure_data_frame(path):
     train2['e3'] = train['EncodedPixels'][2::4].values
     train2['e4'] = train['EncodedPixels'][3::4].values
     train2.reset_index(inplace=True,drop=True)
-    train2.fillna('',inplace=True); 
+    train2.fillna('',inplace=True)
     train2['count'] = np.sum(train2.iloc[:,1:]!='',axis=1).values
     train2.head()
 
@@ -162,16 +166,16 @@ def restructure_data_frame(path):
 
 
 import segmentation_models as sm
-def load_dataset (preprocess_type, batch_size=16):
+def load_dataset (img_h, img_w, preprocess_type, batch_size=16):
     train2 = restructure_data_frame('Severstal_Dataset\\train.csv')
     idx = int(0.8*len(train2)); print()
     preprocess = sm.get_preprocessing(preprocess_type)
 
-    train_batches =  DataGenerator(train2.iloc[:idx], shuffle=True, preprocess=preprocess, batch_size=batch_size,
-                                    width_shift_range=10, height_shift_range=10, zoom_range=0.2, 
-                                    flip_h=True, flip_v=True, brightness=0.2)
+    train_batches =  DataGenerator(train2.iloc[:idx], img_h=img_h, img_w = img_w, shuffle=True, preprocess=preprocess, batch_size=batch_size,
+                                    width_shift_range=20, height_shift_range=20, zoom_range=0.4, 
+                                    flip_h=True, flip_v=True, brightness=0.4)
 
-    valid_batches = DataGenerator(train2.iloc[idx:], preprocess=preprocess, batch_size=batch_size)
+    valid_batches = DataGenerator(train2.iloc[idx:],img_h=img_h, img_w = img_w, preprocess=preprocess, batch_size=batch_size)
     
     """
     iterator = iter(train_batches)
@@ -196,6 +200,53 @@ def load_dataset (preprocess_type, batch_size=16):
     return train_batches, valid_batches 
 
 
+from tqdm import tqdm
+def test_model(model, img_h, img_w, preprocess_type):
+    train2 = restructure_data_frame('Severstal_Dataset\\test.csv')
+    preprocess = sm.get_preprocessing(preprocess_type)
+    
+    test_batches = DataGenerator(train2, img_h=img_h, img_w=img_w, preprocess=preprocess, batch_size=1, subset='test')
+
+    n_samples = 500
+    dice_res = 0
+    iterator = iter(test_batches)
+    for _ in tqdm(range(n_samples)):
+        images, masks = next(iterator)
+
+        for i in range(len(images)):
+            image = images[i].astype(np.int16)
+            mask = masks[i]
+
+            #mask = mask * 255
+            #util.show_imgs((image,
+                            #mask[:,:,0], mask[:,:,1],
+                            #mask[:,:,2], mask[:,:,3]),
+                            #('orig','1','2','3','4'),('','','','',''))
+
+
+            res = model.predict(np.reshape(image,(1,img_h,img_w,3)))
+            res = np.reshape(res,(img_h,img_w,4))
+            res[np.where(res < 0.5)] = 0
+            res[np.where(res >= 0.5)] = 1
+
+            dice_res += dice_coef(mask.astype(np.uint8), res.astype(np.uint8))
+
+            #res = res * 255
+            #util.show_imgs((image,
+                            #res[:,:,0], res[:,:,1],
+                            #res[:,:,2], res[:,:,3]),
+                            #('orig','1','2','3','4'),('','','','',''))
+
+    print (dice_res/n_samples)
+
+
+from tensorflow.keras import backend as K
+def dice_coef(y_true, y_pred, smooth=1):
+    y_true_f = y_true.flatten()
+    y_pred_f = y_pred.flatten()
+    intersection = np.sum(y_true_f * y_pred_f)
+    ret = (2 * intersection + smooth) / (np.sum(y_true_f) + np.sum(y_pred_f) + smooth)
+    return ret
 
 
 
