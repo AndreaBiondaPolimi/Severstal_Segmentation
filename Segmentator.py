@@ -24,8 +24,9 @@ from segmentation_models import Unet
 def resent34_seg_model (input_size, pretrained_weights):
     model = Unet('resnet34', encoder_weights='imagenet', input_shape=input_size, classes=4, activation='sigmoid')
     
-    #model.compile(optimizer = 'adam', loss = 'binary_crossentropy', metrics=[dice_coef])
-    model.compile(optimizer = 'adam', loss = bce_dice_loss , metrics=[dice_coef])
+    #adam = keras.optimizers.Adam(lr=1e-4)
+    model.compile(optimizer = 'adam', loss = 'binary_crossentropy', metrics=[dice_coef])
+    #model.compile(optimizer = adam, loss = bce_dice_loss , metrics=[dice_coef])
 
     model.summary()
 
@@ -70,7 +71,7 @@ def train (model, train_dataset, valid_dataset, epochs):
     
     model.fit(x=train_dataset,
           epochs=epochs,  #### set repeat in training dataset
-          steps_per_epoch=300,
+          steps_per_epoch=800,
           validation_data=valid_dataset,
           validation_steps=200,
           callbacks=callbacks)

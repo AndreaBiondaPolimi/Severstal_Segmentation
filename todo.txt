@@ -4,3 +4,5 @@
 2)New Models (EfficientNet/FPN)
 5)Show test images
 6)Use multiple models and train in parallel
+
+7)classificator defect img vs non-defect img to reduce false positive
