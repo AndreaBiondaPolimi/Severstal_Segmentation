@@ -4,13 +4,8 @@ import numpy as np
 import tensorflow as tf
 import keras
 
-from tensorflow.keras.models import Sequential, Model
-from tensorflow.keras.layers import Conv2D, Dense, MaxPool2D, Dropout, Flatten, BatchNormalization, Activation, add, ZeroPadding2D, Conv2DTranspose
-from tensorflow.keras.layers import Input, GlobalAveragePooling2D, MaxPooling2D, concatenate, UpSampling2D, Add
-from tensorflow.keras.optimizers import Adam, RMSprop
-from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
-from tensorflow.keras import backend as K
-
+from keras import backend as K
+from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
 
 def get_segmentation_model (input_size = (128,800,3), pretrained_weights=None, preprocess_type = 'none'):
     if (preprocess_type == 'resnet34'):
@@ -24,9 +19,9 @@ from segmentation_models import Unet
 def resent34_seg_model (input_size, pretrained_weights):
     model = Unet('resnet34', encoder_weights='imagenet', input_shape=input_size, classes=4, activation='sigmoid')
     
-    #adam = keras.optimizers.Adam(lr=1e-4)
-    model.compile(optimizer = 'adam', loss = 'binary_crossentropy', metrics=[dice_coef])
-    #model.compile(optimizer = adam, loss = bce_dice_loss , metrics=[dice_coef])
+    adam = keras.optimizers.Adam(lr=1e-3)
+    #model.compile(optimizer = 'adam', loss = 'binary_crossentropy', metrics=[dice_coef])
+    model.compile(optimizer = adam, loss = bce_dice_loss , metrics=[dice_coef])
 
     model.summary()
 
@@ -59,27 +54,19 @@ def efficientnetb4_seg_model (input_size, pretrained_weights):
 def train (model, train_dataset, valid_dataset, epochs):
     callbacks = []
 
-    #es_callback = EarlyStopping(monitor='val_loss', patience=70)
-    #checkpoint_loss = ModelCheckpoint(filepath='check_val_loss{epoch:02d}.h5', monitor='val_loss',mode='min', period=1, save_best_only=True) 
     checkpoint_dice = ModelCheckpoint(filepath='check_val_dice{epoch:02d}.h5', monitor='val_dice_coef',mode='max', period=1, save_best_only=True) 
+    scheduler = ReduceLROnPlateau(monitor='val_loss', mode="min", patience=3, factor=0.5, verbose=True)
 
-
-    #callbacks.append(es_callback)
-    #callbacks.append(checkpoint_loss)
     callbacks.append(checkpoint_dice)
-
+    callbacks.append(scheduler)
     
     model.fit(x=train_dataset,
           epochs=epochs,  #### set repeat in training dataset
-          steps_per_epoch=800,
+          steps_per_epoch=train_dataset.__len__(),
           validation_data=valid_dataset,
-          validation_steps=200,
+          validation_steps=valid_dataset.__len__(),
           callbacks=callbacks)
-    
 
-    #model.fit_generator(train_dataset, validation_data = valid_dataset, 
-                        #epochs = 50, verbose=1,
-                        #allbacks=callbacks)
 
     model.save('seg_final.h5')
 

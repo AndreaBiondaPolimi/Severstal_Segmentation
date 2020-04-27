@@ -19,7 +19,7 @@ def load_dataset_segmentation (img_h, img_w, preprocess_type, batch_size=16):
                                     width_shift_range=20, height_shift_range=20, zoom_range=0.4, 
                                     flip_h=True, flip_v=True, brightness=0.4)
 
-    valid_batches = SegmentationDataGenerator(train2.iloc[idx:],img_h=img_h, img_w = img_w, shuffle=True, preprocess=preprocess, batch_size=batch_size)
+    valid_batches = SegmentationDataGenerator(train2.iloc[idx:],img_h=img_h, img_w = img_w, shuffle=False, preprocess=preprocess, batch_size=batch_size)
     
     """
     iterator = iter(train_batches)
@@ -49,7 +49,7 @@ def load_dataset_classification (img_h, img_w, preprocess_type, batch_size=16):
                                     width_shift_range=20, height_shift_range=20, zoom_range=0.4, 
                                     flip_h=True, flip_v=True, brightness=0.4)
 
-    valid_batches = ClassificationDataGenerator(train2.iloc[idx:],img_h=img_h, img_w = img_w, shuffle=True, preprocess=preprocess, batch_size=batch_size)
+    valid_batches = ClassificationDataGenerator(train2.iloc[idx:],img_h=img_h, img_w = img_w, shuffle=False, preprocess=preprocess, batch_size=batch_size)
     
     """
     iterator = iter(train_batches)
@@ -91,12 +91,12 @@ def test_model(model, img_h, img_w, preprocess_type):
             image = images[i].astype(np.int16)
             mask = masks[i]
 
-            
-            mask = mask * 255
-            util.show_imgs((image,
-                            mask[:,:,0], mask[:,:,1],
-                            mask[:,:,2], mask[:,:,3]),
-                            ('orig','1','2','3','4'),('','','','',''))
+        
+            #mask = mask * 255
+            #util.show_imgs((image,
+                            #mask[:,:,0], mask[:,:,1],
+                            #mask[:,:,2], mask[:,:,3]),
+                            #('orig','1','2','3','4'),('','','','',''))
             
 
 
@@ -108,12 +108,13 @@ def test_model(model, img_h, img_w, preprocess_type):
             dice_res += dice_coef(mask.astype(np.uint8), res.astype(np.uint8))
             
             
-            res = res * 255
-            util.show_imgs((image,
-                            res[:,:,0], res[:,:,1],
-                            res[:,:,2], res[:,:,3]),
-                            ('orig','1','2','3','4'),('','','','',''))
+            #res = res * 255
+            #util.show_imgs((image,
+                            #res[:,:,0], res[:,:,1],
+                            #res[:,:,2], res[:,:,3]),
+                            #('orig','1','2','3','4'),('','','','',''))
             
+
     print (dice_res/(n_samples*bs))
 
 
