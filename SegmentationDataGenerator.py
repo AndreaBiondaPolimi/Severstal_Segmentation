@@ -7,6 +7,8 @@ from keras.preprocessing.image import ImageDataGenerator
 import utils as util
 from keras.preprocessing.image import apply_affine_transform
 import pandas as pd
+import cv2
+import tensorflow as tf
 
 path = 'Severstal_Dataset'
 train_path = 'Severstal_Dataset\\train_images\\images_all\\imgs\\'
@@ -16,7 +18,7 @@ class SegmentationDataGenerator(keras.utils.Sequence):
     def __init__(self, df, img_h = 128, img_w=1600, batch_size = 16, subset="train", shuffle=False, 
                  preprocess=None, info={},
                  rotation_range=0, width_shift_range=0, height_shift_range=0,
-                 zoom_range=0, flip_h=False, flip_v=False, brightness=0, fill_mode='constant'):
+                 flip_h=False, flip_v=False, brightness=0, fill_mode='constant'):
         super().__init__()
         self.df = df
         self.img_h = img_h
@@ -30,7 +32,6 @@ class SegmentationDataGenerator(keras.utils.Sequence):
         self.rotation_range = rotation_range
         self.width_shift_range = width_shift_range
         self.height_shift_range = height_shift_range
-        self.zoom_range = zoom_range
         self.flip_h = flip_h
         self.flip_v = flip_v
         self.brightness = brightness
@@ -57,27 +58,30 @@ class SegmentationDataGenerator(keras.utils.Sequence):
         indexes = self.indexes[index*self.batch_size:(index+1)*self.batch_size]
         for i,f in enumerate(self.df['ImageId'].iloc[indexes]):
             self.info[index*self.batch_size+i]=f
-            X[i,] = Image.open(self.data_path + f).resize((self.img_w,self.img_h)) 
+            random_crop_indexes = get_random_crop_indexes((256,1600),(self.img_h,self.img_w))
+
+            img = cv2.imread(self.data_path + f)
             for j in range(4):
-                y[i,:,:,j] = rle2maskResize(self.df['e'+str(j+1)].iloc[indexes[i]], self.img_h, self.img_w)
+                mask = rle2maskResize(self.df['e'+str(j+1)].iloc[indexes[i]])  
+                #Random Crop              
+                X[i,], y[i,:,:,j] = random_crop(img, mask, random_crop_indexes)
+
         if self.preprocess!=None: 
             X = self.preprocess(X)
 
+        #Data augmentation
         datagen = ImageDataGenerator()
         for i in range(len(X)):
             theta = np.random.uniform(-self.rotation_range,self.rotation_range)
             tx = np.random.uniform(-self.width_shift_range,self.width_shift_range)
             ty = np.random.uniform(-self.height_shift_range,self.height_shift_range)
-            z = np.random.uniform(1-self.zoom_range,1+self.zoom_range)
             br = np.random.uniform(1-self.brightness,1+self.brightness)
             f_h = np.random.choice([True, False], p=[0.5, 0.5]) if (self.flip_h) else False
             f_v = np.random.choice([True, False], p=[0.5, 0.5]) if (self.flip_v) else False
             fill_mode = self.fill_mode
-
-            X[i] = apply_affine_transform(X[i], theta=theta, tx=tx, ty=ty, zx=z, zy=z,
-                                         fill_mode=fill_mode)
-            y[i] = apply_affine_transform(y[i], theta=theta, tx=tx, ty=ty, zx=z, zy=z,
-                                         fill_mode=fill_mode)
+        
+            X[i] = apply_affine_transform(X[i], theta=theta, tx=tx, ty=ty, fill_mode=fill_mode)
+            y[i] = apply_affine_transform(y[i], theta=theta, tx=tx, ty=ty, fill_mode=fill_mode)
 
             X[i] = datagen.apply_transform(x=X[i], 
                             transform_parameters={'brightness':br, 'flip_horizontal':f_h, 'flip_vertical':f_v})
@@ -90,14 +94,13 @@ class SegmentationDataGenerator(keras.utils.Sequence):
 
 
 
-# https://www.kaggle.com/titericz/building-and-visualizing-masks
-def rle2maskResize(rle, img_h, img_w):
+def rle2maskResize(rle):
+    height= 256
+    width = 1600
     # CONVERT RLE TO MASK 
     if (pd.isnull(rle))|(rle==''): 
-        return np.zeros((img_h,img_w) ,dtype=np.uint8)
-    
-    height= img_h
-    width = img_w
+        return np.zeros((height,width) ,dtype=np.uint8)
+
     mask= np.zeros( width*height ,dtype=np.uint8)
 
     array = np.asarray([int(x) for x in rle.split()])
@@ -106,10 +109,7 @@ def rle2maskResize(rle, img_h, img_w):
     for index, start in enumerate(starts):
         mask[int(start):int(start+lengths[index])] = 1
 
-    #ret = mask.reshape( (height,width), order='F' )[::2,::2]
-    ret = mask.reshape( (height,width), order='F' )
-    
-    return ret
+    return mask.reshape( (height,width), order='F' )
 
 def mask2contour(mask, width=3):
     # CONVERT MASK TO ITS CONTOUR
@@ -146,3 +146,17 @@ def mask2pad(mask, pad=2):
     return mask 
 
 
+def get_random_crop_indexes(original_image_size, random_crop_size):
+    height, width = original_image_size
+    dy, dx = random_crop_size
+    x = np.random.randint(0, width - dx + 1)
+    y = np.random.randint(0, height - dy + 1)
+
+    return ((dx, dy), (x,y))
+
+def random_crop(img, mask, random_crop_indexes):
+    (dx, dy), (x,y) = random_crop_indexes
+
+    img_cropped = img[y:(y+dy), x:(x+dx), :]
+    mask_cropped = mask[y:(y+dy), x:(x+dx)]
+    return (img_cropped, mask_cropped)

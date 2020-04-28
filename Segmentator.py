@@ -7,7 +7,7 @@ import keras
 from keras import backend as K
 from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
 
-def get_segmentation_model (input_size = (128,800,3), pretrained_weights=None, preprocess_type = 'none'):
+def get_segmentation_model (input_size = (None, None, 3), pretrained_weights=None, preprocess_type = 'none'):
     if (preprocess_type == 'resnet34'):
         return resent34_seg_model(input_size, pretrained_weights)
     elif (preprocess_type == 'efficientnetb4'):

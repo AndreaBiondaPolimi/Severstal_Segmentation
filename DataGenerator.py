@@ -15,15 +15,13 @@ def load_dataset_segmentation (img_h, img_w, preprocess_type, batch_size=16):
     idx = int(0.8*len(train2)); print()
     preprocess = sm.get_preprocessing(preprocess_type)
 
-    train_batches =  SegmentationDataGenerator(train2.iloc[:idx], img_h=img_h, img_w = img_w, shuffle=True, preprocess=preprocess, batch_size=batch_size,
-                                    width_shift_range=20, height_shift_range=20, zoom_range=0.4, 
-                                    flip_h=True, flip_v=True, brightness=0.4)
+    train_batches =  SegmentationDataGenerator(train2.iloc[:idx], img_h=img_h, img_w = img_w, shuffle=True, preprocess=preprocess, 
+                                                batch_size=batch_size, flip_h=True, flip_v=True, brightness=0.3)
 
-    valid_batches = SegmentationDataGenerator(train2.iloc[idx:],img_h=img_h, img_w = img_w, shuffle=False, preprocess=preprocess, batch_size=batch_size)
+    valid_batches = SegmentationDataGenerator(train2.iloc[idx:], img_h=256, img_w=1600, shuffle=True, preprocess=preprocess, batch_size=batch_size)
     
-    """
     iterator = iter(train_batches)
-    for _ in range(20):
+    for _ in range(100):
         images, masks = next(iterator)
         masks = masks * 255
 
@@ -35,7 +33,6 @@ def load_dataset_segmentation (img_h, img_w, preprocess_type, batch_size=16):
                             mask[:,:,0], mask[:,:,1],
                             mask[:,:,2], mask[:,:,3]),
                             ('orig','1','2','3','4'),('','','','',''))
-    """
 
     return train_batches, valid_batches 
 
@@ -45,11 +42,10 @@ def load_dataset_classification (img_h, img_w, preprocess_type, batch_size=16):
     idx = int(0.8*len(train2)); print()
     preprocess = sm.get_preprocessing(preprocess_type)
 
-    train_batches =  ClassificationDataGenerator(train2.iloc[:idx], img_h=img_h, img_w = img_w, shuffle=True, preprocess=preprocess, batch_size=batch_size,
-                                    width_shift_range=20, height_shift_range=20, zoom_range=0.4, 
-                                    flip_h=True, flip_v=True, brightness=0.4)
+    train_batches =  ClassificationDataGenerator(train2.iloc[:idx], img_h=img_h, img_w = img_w, shuffle=True, preprocess=preprocess, 
+                                                batch_size=batch_size, flip_h=True, flip_v=True, brightness=0.3)
 
-    valid_batches = ClassificationDataGenerator(train2.iloc[idx:],img_h=img_h, img_w = img_w, shuffle=False, preprocess=preprocess, batch_size=batch_size)
+    valid_batches = ClassificationDataGenerator(train2.iloc[idx:],img_h=img_h, img_w = img_w, shuffle=True, preprocess=preprocess, batch_size=batch_size)
     
     """
     iterator = iter(train_batches)

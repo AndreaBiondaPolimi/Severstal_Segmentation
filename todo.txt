@@ -1,10 +1,16 @@
 (1)Data Augmentation (hflip,vflip,brighth,zoom,shift)
 
-2)implement train on crop and valid on full
+(2)implement train on crop and valid on full
+	2.1)epoch with different crop size
+	2.2)batch with balanced class
+
 (3)Use lr scheduler
+
 4)Different loss (dice+bce -> lovasz)
 
+
 When reached a decent level of segmentation-dice (0.7)
+
 
 5)Pre classification stage to remove false positive (defect vs non-defect imgs)
 

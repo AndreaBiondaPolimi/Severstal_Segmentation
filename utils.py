@@ -39,3 +39,5 @@ def restructure_data_frame(path):
     train2.head()
 
     return train2
+
+
