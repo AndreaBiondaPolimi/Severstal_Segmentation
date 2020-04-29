@@ -4,22 +4,19 @@ import tensorflow as tf
 import DataGenerator as dg
 import Classificator as cla
 
-img_h=128
-img_w=800
-
 def segment ():
-    preprocess_type='resnet34'; batch_size=4
+    preprocess_type='resnet34'
     #preprocess_type='efficientnetb4'; batch_size=1
 
-    train, valid = dg.load_dataset_segmentation(img_h, img_w, preprocess_type, batch_size)
+    train, valid = dg.load_dataset_segmentation(preprocess_type)
     
     
     model = seg.get_segmentation_model(preprocess_type=preprocess_type,
-                                       pretrained_weights=None)
+                                       pretrained_weights='check_val_dice27.h5')
 
-    seg.train(model, train, valid, 50)
+    #seg.train(model, train, valid, 100)
 
-    #dg.test_model(model, img_h, img_w, preprocess_type)
+    dg.test_model(model, preprocess_type)
 
 
 

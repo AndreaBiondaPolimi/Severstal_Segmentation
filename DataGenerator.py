@@ -10,16 +10,19 @@ from SegmentationDataGenerator import SegmentationDataGenerator
 from ClassificationDataGenerator import ClassificationDataGenerator
 
 import segmentation_models as sm
-def load_dataset_segmentation (img_h, img_w, preprocess_type, batch_size=16):
+def load_dataset_segmentation (preprocess_type):
     train2 = util.restructure_data_frame('Severstal_Dataset\\train.csv')
     idx = int(0.8*len(train2)); print()
+
     preprocess = sm.get_preprocessing(preprocess_type)
+    shapes = ((10,256,256), (10,256,512), (10,256,608))
 
-    train_batches =  SegmentationDataGenerator(train2.iloc[:idx], img_h=img_h, img_w = img_w, shuffle=True, preprocess=preprocess, 
-                                                batch_size=batch_size, flip_h=True, flip_v=True, brightness=0.3)
+    train_batches =  SegmentationDataGenerator(train2.iloc[:idx], shapes=shapes, shuffle=True, preprocess=preprocess, 
+                                                flip_h=True, flip_v=True)
 
-    valid_batches = SegmentationDataGenerator(train2.iloc[idx:], img_h=256, img_w=1600, shuffle=True, preprocess=preprocess, batch_size=batch_size)
+    valid_batches = SegmentationDataGenerator(train2.iloc[idx:], shuffle=True, preprocess=preprocess)
     
+    """
     iterator = iter(train_batches)
     for _ in range(100):
         images, masks = next(iterator)
@@ -33,8 +36,11 @@ def load_dataset_segmentation (img_h, img_w, preprocess_type, batch_size=16):
                             mask[:,:,0], mask[:,:,1],
                             mask[:,:,2], mask[:,:,3]),
                             ('orig','1','2','3','4'),('','','','',''))
-
+    """
+    
     return train_batches, valid_batches 
+
+
 
 
 def load_dataset_classification (img_h, img_w, preprocess_type, batch_size=16):
@@ -70,12 +76,12 @@ def load_dataset_classification (img_h, img_w, preprocess_type, batch_size=16):
 
 
 from tqdm import tqdm
-def test_model(model, img_h, img_w, preprocess_type):
+def test_model(model, preprocess_type):
     train2 = util.restructure_data_frame('Severstal_Dataset\\test.csv')
     preprocess = sm.get_preprocessing(preprocess_type)
     bs = 2
     
-    test_batches = SegmentationDataGenerator(train2, img_h=img_h, img_w=img_w, preprocess=preprocess, batch_size=bs, subset='test')
+    test_batches = SegmentationDataGenerator(train2, preprocess=preprocess, shapes=((bs,256,1600),), subset='test')
 
     n_samples = 500
     dice_res = 0
@@ -96,8 +102,8 @@ def test_model(model, img_h, img_w, preprocess_type):
             
 
 
-            res = model.predict(np.reshape(image,(1,img_h,img_w,3)))
-            res = np.reshape(res,(img_h,img_w,4))
+            res = model.predict(np.reshape(image,(1,256,1600,3)))
+            res = np.reshape(res,(256,1600,4))
             res[np.where(res < 0.5)] = 0
             res[np.where(res >= 0.5)] = 1
 

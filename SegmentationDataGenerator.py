@@ -15,17 +15,17 @@ train_path = 'Severstal_Dataset\\train_images\\images_all\\imgs\\'
 test_path = 'Severstal_Dataset\\test_images\\'
 
 class SegmentationDataGenerator(keras.utils.Sequence):
-    def __init__(self, df, img_h = 128, img_w=1600, batch_size = 16, subset="train", shuffle=False, 
+    def __init__(self, df, shapes=((4,256,1600),), subset="train", shuffle=False, 
                  preprocess=None, info={},
                  rotation_range=0, width_shift_range=0, height_shift_range=0,
-                 flip_h=False, flip_v=False, brightness=0, fill_mode='constant'):
+                 flip_h=False, flip_v=False, fill_mode='constant'):
         super().__init__()
         self.df = df
-        self.img_h = img_h
-        self.img_w = img_w
+        self.shapes = shapes
+        self.shape_idx = 0
+
         self.shuffle = shuffle
         self.subset = subset
-        self.batch_size = batch_size
         self.preprocess = preprocess
         self.info = info
 
@@ -34,7 +34,6 @@ class SegmentationDataGenerator(keras.utils.Sequence):
         self.height_shift_range = height_shift_range
         self.flip_h = flip_h
         self.flip_v = flip_v
-        self.brightness = brightness
         self.fill_mode = fill_mode
 
         
@@ -47,12 +46,24 @@ class SegmentationDataGenerator(keras.utils.Sequence):
     def __len__(self):
         return int(np.floor(len(self.df) / self.batch_size))
     
+
     def on_epoch_end(self):
+        self.batch_size = self.shapes[self.shape_idx][0]
+        self.img_h = self.shapes[self.shape_idx][1]
+        self.img_w = self.shapes[self.shape_idx][2]
+
+        #print ((self.img_h,self.img_h))
+        
+        self.shape_idx += 1
+        if (self.shape_idx >= len(self.shapes)):
+            self.shape_idx = 0
+
         self.indexes = np.arange(len(self.df))
         if self.shuffle == True:
             np.random.shuffle(self.indexes)
     
-    def __getitem__(self, index): 
+
+    def __getitem__(self, index): #index restart automatically seems when max is reached
         X = np.empty((self.batch_size,self.img_h,self.img_w,3),dtype=np.float32)
         y = np.empty((self.batch_size,self.img_h,self.img_w,4),dtype=np.int8)
         indexes = self.indexes[index*self.batch_size:(index+1)*self.batch_size]
@@ -60,7 +71,8 @@ class SegmentationDataGenerator(keras.utils.Sequence):
             self.info[index*self.batch_size+i]=f
             random_crop_indexes = get_random_crop_indexes((256,1600),(self.img_h,self.img_w))
 
-            img = cv2.imread(self.data_path + f)
+            #img = cv2.imread(self.data_path + f)
+            img = np.asarray(Image.open(self.data_path + f))
             for j in range(4):
                 mask = rle2maskResize(self.df['e'+str(j+1)].iloc[indexes[i]])  
                 #Random Crop              
@@ -75,7 +87,6 @@ class SegmentationDataGenerator(keras.utils.Sequence):
             theta = np.random.uniform(-self.rotation_range,self.rotation_range)
             tx = np.random.uniform(-self.width_shift_range,self.width_shift_range)
             ty = np.random.uniform(-self.height_shift_range,self.height_shift_range)
-            br = np.random.uniform(1-self.brightness,1+self.brightness)
             f_h = np.random.choice([True, False], p=[0.5, 0.5]) if (self.flip_h) else False
             f_v = np.random.choice([True, False], p=[0.5, 0.5]) if (self.flip_v) else False
             fill_mode = self.fill_mode
@@ -84,11 +95,10 @@ class SegmentationDataGenerator(keras.utils.Sequence):
             y[i] = apply_affine_transform(y[i], theta=theta, tx=tx, ty=ty, fill_mode=fill_mode)
 
             X[i] = datagen.apply_transform(x=X[i], 
-                            transform_parameters={'brightness':br, 'flip_horizontal':f_h, 'flip_vertical':f_v})
+                            transform_parameters={'flip_horizontal':f_h, 'flip_vertical':f_v})
 
             y[i] = datagen.apply_transform(x=y[i], 
-                            transform_parameters={'flip_horizontal':f_h, 'flip_vertical':f_v})
-        
+                            transform_parameters={'flip_horizontal':f_h, 'flip_vertical':f_v})       
         
         return X, y
 

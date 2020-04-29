@@ -60,14 +60,23 @@ def train (model, train_dataset, valid_dataset, epochs):
     callbacks.append(checkpoint_dice)
     callbacks.append(scheduler)
     
+    
     model.fit(x=train_dataset,
           epochs=epochs,  #### set repeat in training dataset
           steps_per_epoch=train_dataset.__len__(),
           validation_data=valid_dataset,
           validation_steps=valid_dataset.__len__(),
-          callbacks=callbacks)
-
-
+          callbacks=callbacks,
+          shuffle=True)
+    
+    """
+    for i in range (epochs):
+        model.fit(x=train_dataset, 
+                        steps_per_epoch=train_dataset.__len__(),
+                        validation_data = valid_dataset, 
+                        validation_steps=valid_dataset.__len__(),
+                        callbacks=callbacks, shuffle=False)
+    """
     model.save('seg_final.h5')
 
 

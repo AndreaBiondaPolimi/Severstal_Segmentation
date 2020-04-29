@@ -1,8 +1,9 @@
 (1)Data Augmentation (hflip,vflip,brighth,zoom,shift)
 
 (2)implement train on crop and valid on full
-	2.1)epoch with different crop size
-	2.2)batch with balanced class
+	(2.1)epoch with different crop size
+	2.2)epoch with different batch size -> to increment training speed
+	2.3)batch with balanced class
 
 (3)Use lr scheduler
 
@@ -13,7 +14,7 @@ When reached a decent level of segmentation-dice (0.7)
 
 
 5)Pre classification stage to remove false positive (defect vs non-defect imgs)
-
+	5)implement data gnerator as segmentation
 
 6)New Models (EfficientNet/FPN)
 7)Multi models ensamble
