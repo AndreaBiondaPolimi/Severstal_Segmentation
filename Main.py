@@ -12,11 +12,11 @@ def segment ():
     
     
     model = seg.get_segmentation_model(preprocess_type=preprocess_type,
-                                       pretrained_weights='check_val_dice27.h5')
+                                       pretrained_weights='check_val_dice48.h5')
 
-    #seg.train(model, train, valid, 100)
+    seg.train(model, train, valid, 100)
 
-    dg.test_model(model, preprocess_type)
+    #dg.test_model(model, preprocess_type)
 
 
 

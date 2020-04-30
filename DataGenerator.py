@@ -17,12 +17,13 @@ def load_dataset_segmentation (preprocess_type):
     preprocess = sm.get_preprocessing(preprocess_type)
     shapes = ((10,256,256), (10,256,512), (10,256,608))
 
-    train_batches =  SegmentationDataGenerator(train2.iloc[:idx], shapes=shapes, shuffle=True, preprocess=preprocess, 
+    train_batches =  SegmentationDataGenerator(train2.iloc[:idx], shapes=shapes, shuffle=True, preprocess=preprocess,
+                                                rotation_range=10, width_shift_range=20, height_shift_range=20,
                                                 flip_h=True, flip_v=True)
 
     valid_batches = SegmentationDataGenerator(train2.iloc[idx:], shuffle=True, preprocess=preprocess)
     
-    """
+    
     iterator = iter(train_batches)
     for _ in range(100):
         images, masks = next(iterator)
@@ -36,7 +37,7 @@ def load_dataset_segmentation (preprocess_type):
                             mask[:,:,0], mask[:,:,1],
                             mask[:,:,2], mask[:,:,3]),
                             ('orig','1','2','3','4'),('','','','',''))
-    """
+    
     
     return train_batches, valid_batches 
 
@@ -83,7 +84,7 @@ def test_model(model, preprocess_type):
     
     test_batches = SegmentationDataGenerator(train2, preprocess=preprocess, shapes=((bs,256,1600),), subset='test')
 
-    n_samples = 500
+    n_samples = test_batches.__len__()
     dice_res = 0
     iterator = iter(test_batches)
     for _ in tqdm(range(n_samples)):

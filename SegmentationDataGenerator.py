@@ -69,17 +69,15 @@ class SegmentationDataGenerator(keras.utils.Sequence):
         indexes = self.indexes[index*self.batch_size:(index+1)*self.batch_size]
         for i,f in enumerate(self.df['ImageId'].iloc[indexes]):
             self.info[index*self.batch_size+i]=f
-            random_crop_indexes = get_random_crop_indexes((256,1600),(self.img_h,self.img_w))
-
-            #img = cv2.imread(self.data_path + f)
+            
             img = np.asarray(Image.open(self.data_path + f))
+
+            random_crop_indexes = get_random_crop_indexes_v2((256,1600),(self.img_h,self.img_w), img)
+
             for j in range(4):
                 mask = rle2maskResize(self.df['e'+str(j+1)].iloc[indexes[i]])  
                 #Random Crop              
                 X[i,], y[i,:,:,j] = random_crop(img, mask, random_crop_indexes)
-
-        if self.preprocess!=None: 
-            X = self.preprocess(X)
 
         #Data augmentation
         datagen = ImageDataGenerator()
@@ -98,7 +96,10 @@ class SegmentationDataGenerator(keras.utils.Sequence):
                             transform_parameters={'flip_horizontal':f_h, 'flip_vertical':f_v})
 
             y[i] = datagen.apply_transform(x=y[i], 
-                            transform_parameters={'flip_horizontal':f_h, 'flip_vertical':f_v})       
+                            transform_parameters={'flip_horizontal':f_h, 'flip_vertical':f_v})     
+
+        if self.preprocess!=None: 
+            X = self.preprocess(X)  
         
         return X, y
 
@@ -170,3 +171,43 @@ def random_crop(img, mask, random_crop_indexes):
     img_cropped = img[y:(y+dy), x:(x+dx), :]
     mask_cropped = mask[y:(y+dy), x:(x+dx)]
     return (img_cropped, mask_cropped)
+
+
+#Try to get the random crop that does not show full black image, 
+#usually steel is on the right or on the left when background is present
+def get_random_crop_indexes_v2(original_image_size, random_crop_size, img):
+    n_tries_before_default = 1 #Try n times to get the random crop before rx/lx choice
+    height, width = original_image_size
+    dy, dx = random_crop_size
+
+    for i in range (n_tries_before_default):
+        x = np.random.randint(0, width - dx + 1)
+        y = np.random.randint(0, height - dy + 1)
+
+        if (not is_total_black(img, x, y, dx, dy)):
+            return ((dx, dy), (x,y))
+
+    #Try with left crop
+    x = 0
+    y = np.random.randint(0, height - dy + 1)
+    if (not is_total_black(img, x, y, dx, dy)):
+        return ((dx, dy), (x,y))
+
+    #Try with right crop
+    x = width - dx - 1
+    y = np.random.randint(0, height - dy + 1)
+
+    return ((dx, dy), (x,y))
+   
+
+
+def is_total_black(img, x, y, dx, dy):
+    cropped_img = img[y:(y+dy), x:(x+dx), :].copy()
+    #plt.imshow(cropped_img)
+    #plt.show()
+
+    cropped_img[cropped_img < 30] = 0
+    if (np.count_nonzero(cropped_img) > 0):
+        return False
+    return True
+    
