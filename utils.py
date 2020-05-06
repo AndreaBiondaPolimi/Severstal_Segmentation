@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+#Show image
 def show_imgs (imgs, titles, messages):
     n_img = len(imgs)
     _ , axarr = plt.subplots(n_img)
@@ -21,7 +22,7 @@ def show_imgs (imgs, titles, messages):
 
     plt.show()
 
-
+#Dataframe restructure
 def restructure_data_frame(path):
     train = pd.read_csv(path)
 
@@ -40,4 +41,56 @@ def restructure_data_frame(path):
 
     return train2
 
+
+#Mask creation
+def rle2maskResize(rle):
+    height= 256
+    width = 1600
+    # CONVERT RLE TO MASK 
+    if (pd.isnull(rle))|(rle==''): 
+        return np.zeros((height,width) ,dtype=np.uint8)
+
+    mask= np.zeros( width*height ,dtype=np.uint8)
+
+    array = np.asarray([int(x) for x in rle.split()])
+    starts = array[0::2]-1
+    lengths = array[1::2]    
+    for index, start in enumerate(starts):
+        mask[int(start):int(start+lengths[index])] = 1
+
+    return mask.reshape( (height,width), order='F' )
+
+def mask2contour(mask, width=3):
+    # CONVERT MASK TO ITS CONTOUR
+    w = mask.shape[1]
+    h = mask.shape[0]
+    mask2 = np.concatenate([mask[:,width:],np.zeros((h,width))],axis=1)
+    mask2 = np.logical_xor(mask,mask2)
+    mask3 = np.concatenate([mask[width:,:],np.zeros((width,w))],axis=0)
+    mask3 = np.logical_xor(mask,mask3)
+    return np.logical_or(mask2,mask3) 
+
+def mask2pad(mask, pad=2):
+    # ENLARGE MASK TO INCLUDE MORE SPACE AROUND DEFECT
+    w = mask.shape[1]
+    h = mask.shape[0]
+    
+    # MASK UP
+    for k in range(1,pad,2):
+        temp = np.concatenate([mask[k:,:],np.zeros((k,w))],axis=0)
+        mask = np.logical_or(mask,temp)
+    # MASK DOWN
+    for k in range(1,pad,2):
+        temp = np.concatenate([np.zeros((k,w)),mask[:-k,:]],axis=0)
+        mask = np.logical_or(mask,temp)
+    # MASK LEFT
+    for k in range(1,pad,2):
+        temp = np.concatenate([mask[:,k:],np.zeros((h,k))],axis=1)
+        mask = np.logical_or(mask,temp)
+    # MASK RIGHT
+    for k in range(1,pad,2):
+        temp = np.concatenate([np.zeros((h,k)),mask[:,:-k]],axis=1)
+        mask = np.logical_or(mask,temp)
+    
+    return mask 
 

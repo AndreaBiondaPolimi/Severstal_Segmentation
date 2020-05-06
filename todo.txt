@@ -1,5 +1,5 @@
 (1)Data Augmentation (hflip,vflip,brighth,zoom,shift)
-	1.1)Implement complete data augmentation -> proviamo albumentations
+	(1.1)Implement complete data augmentation -> proviamo albumentations
 	(1.2)Proprocessing ??? per ResnetXXX no problem, per gli altri va implmentato l'undo-rescale nella visualizzazione
 
 (2)implement train on crop and valid on full

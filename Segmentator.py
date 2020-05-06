@@ -19,7 +19,7 @@ from segmentation_models import Unet
 def resent34_seg_model (input_size, pretrained_weights):
     model = Unet('resnet34', encoder_weights='imagenet', input_shape=input_size, classes=4, activation='sigmoid')
     
-    adam = keras.optimizers.Adam(lr=1e-3)
+    adam = keras.optimizers.Adam(lr=1e-5)
     #model.compile(optimizer = 'adam', loss = 'binary_crossentropy', metrics=[dice_coef])
     model.compile(optimizer = adam, loss = bce_dice_loss , metrics=[dice_coef])
 
@@ -34,8 +34,7 @@ def resent34_seg_model (input_size, pretrained_weights):
 def efficientnetb4_seg_model (input_size, pretrained_weights):
     model = Unet('efficientnetb4', encoder_weights='imagenet', input_shape=input_size, classes=4, activation='sigmoid')
 
-
-    adam = keras.optimizers.Adam(lr=1e-4)
+    adam = keras.optimizers.Adam(lr=1e-3)
     #model.compile(optimizer = 'adam', loss = 'binary_crossentropy', metrics=[dice_coef])
     model.compile(optimizer = adam, loss = bce_dice_loss , metrics=[dice_coef])
     #model.compile(optimizer = adam, loss = lovasz_loss , metrics=[dice_coef])

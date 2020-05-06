@@ -12,15 +12,15 @@ def segment ():
     
     
     model = seg.get_segmentation_model(preprocess_type=preprocess_type,
-                                       pretrained_weights='check_val_dice48.h5')
+                                       pretrained_weights='check_val_dice37.h5')
 
-    seg.train(model, train, valid, 100)
+    #seg.train(model, train, valid, 100)
 
-    #dg.test_model(model, preprocess_type)
-
-
+    dg.test_model(model, preprocess_type)
 
 
+
+"""
 def classify ():
     preprocess_type='resnet34'; batch_size=4
 
@@ -33,7 +33,7 @@ def classify ():
     seg.train(model, train, valid, 50)
 
     #dg.test_model(model, img_h, img_w, preprocess_type)
-
+"""
 
 segment()
 #classify()

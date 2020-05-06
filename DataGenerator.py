@@ -9,6 +9,9 @@ from keras.preprocessing.image import apply_affine_transform
 from SegmentationDataGenerator import SegmentationDataGenerator
 from ClassificationDataGenerator import ClassificationDataGenerator
 
+augmentation_parameters = {'flip_prob':0.5, 'shift_limit':0.1, 'rotate_limit':20, 'shift_rot_prob':0.5, 
+                           'contrast_limit':0.2, 'brightness_limit':0.2, 'contr_bright_prob':0.5}
+
 import segmentation_models as sm
 def load_dataset_segmentation (preprocess_type):
     train2 = util.restructure_data_frame('Severstal_Dataset\\train.csv')
@@ -17,13 +20,12 @@ def load_dataset_segmentation (preprocess_type):
     preprocess = sm.get_preprocessing(preprocess_type)
     shapes = ((10,256,256), (10,256,512), (10,256,608))
 
-    train_batches =  SegmentationDataGenerator(train2.iloc[:idx], shapes=shapes, shuffle=True, preprocess=preprocess,
-                                                rotation_range=10, width_shift_range=20, height_shift_range=20,
-                                                flip_h=True, flip_v=True)
+    train_batches =  SegmentationDataGenerator(train2.iloc[:idx], shapes=shapes, shuffle=True, 
+                                                preprocess=preprocess, augmentation_parameters=augmentation_parameters)
 
     valid_batches = SegmentationDataGenerator(train2.iloc[idx:], shuffle=True, preprocess=preprocess)
     
-    
+    """
     iterator = iter(train_batches)
     for _ in range(100):
         images, masks = next(iterator)
@@ -37,7 +39,7 @@ def load_dataset_segmentation (preprocess_type):
                             mask[:,:,0], mask[:,:,1],
                             mask[:,:,2], mask[:,:,3]),
                             ('orig','1','2','3','4'),('','','','',''))
-    
+    """
     
     return train_batches, valid_batches 
 
@@ -95,27 +97,27 @@ def test_model(model, preprocess_type):
             mask = masks[i]
 
         
-            #mask = mask * 255
-            #util.show_imgs((image,
-                            #mask[:,:,0], mask[:,:,1],
-                            #mask[:,:,2], mask[:,:,3]),
-                            #('orig','1','2','3','4'),('','','','',''))
+            mask = mask * 255
+            util.show_imgs((image,
+                            mask[:,:,0], mask[:,:,1],
+                            mask[:,:,2], mask[:,:,3]),
+                            ('orig','1','2','3','4'),('','','','',''))
             
 
 
             res = model.predict(np.reshape(image,(1,256,1600,3)))
             res = np.reshape(res,(256,1600,4))
-            res[np.where(res < 0.5)] = 0
-            res[np.where(res >= 0.5)] = 1
+            #res[np.where(res < 0.5)] = 0
+            #res[np.where(res >= 0.5)] = 1
 
             dice_res += dice_coef(mask.astype(np.uint8), res.astype(np.uint8))
             
             
             #res = res * 255
-            #util.show_imgs((image,
-                            #res[:,:,0], res[:,:,1],
-                            #res[:,:,2], res[:,:,3]),
-                            #('orig','1','2','3','4'),('','','','',''))
+            util.show_imgs((image,
+                            res[:,:,0], res[:,:,1],
+                            res[:,:,2], res[:,:,3]),
+                            ('orig','1','2','3','4'),('','','','',''))
             
 
     print (dice_res/(n_samples*bs))
@@ -129,71 +131,3 @@ def dice_coef(y_true, y_pred, smooth=1):
     ret = (2 * intersection + smooth) / (np.sum(y_true_f) + np.sum(y_pred_f) + smooth)
     return ret
 
-
-
-
-
-
-
-
-
-"""
-def show_examples(train2):
-    # DEFECTIVE IMAGE SAMPLES
-    filenames = {}
-    defects = list(train2[train2['e1']!=''].sample(3).index)
-    defects += list(train2[train2['e2']!=''].sample(3).index)
-    defects += list(train2[train2['e3']!=''].sample(7).index)
-    defects += list(train2[train2['e4']!=''].sample(3).index)
-
-    # DATA GENERATOR
-    train_batches = DataGenerator(train2[train2.index.isin(defects)], shuffle=True, info=filenames)
-    print('Images and masks from our Data Generator')
-    print('KEY: yellow=defect1, green=defect2, blue=defect3, magenta=defect4')
-
-    # DISPLAY IMAGES WITH DEFECTS
-    for i,batch in enumerate(train_batches):
-        plt.figure(figsize=(14,50)) #20,18
-        for k in range(8):
-            plt.subplot(8,1,k+1)
-            img = batch[0][k,]
-            img = Image.fromarray(img.astype('uint8'))
-            img = np.array(img)
-            extra = '  has defect'
-            for j in range(4):
-                msk = batch[1][k,:,:,j]
-                msk = mask2pad(msk,pad=3)
-                msk = mask2contour(msk,width=2)
-                if np.sum(msk)!=0: extra += ' '+str(j+1)
-                if j==0: # yellow
-                    img[msk==1,0] = 235 
-                    img[msk==1,1] = 235
-                elif j==1: img[msk==1,1] = 210 # green
-                elif j==2: img[msk==1,2] = 255 # blue
-                elif j==3: # magenta
-                    img[msk==1,0] = 255
-                    img[msk==1,2] = 255
-            plt.title(filenames[16*i+k]+extra)
-            plt.axis('off') 
-            plt.imshow(img)
-        plt.subplots_adjust(wspace=0.05)
-        plt.show()
-"""
-"""
-train_df = pd.read_csv(training_dir + '\\train.csv')
-data = np.array(train_df)
-new_data = []
-
-for i in range(len(data)):
-    for j in range(4):
-        num = j+1
-        if num == data[i][1]:
-            new_data.append([data[i][0]+"_"+str(num), data[i][2]])
-        else:
-            new_data.append([data[i][0]+"_"+str(num)])
-
-original_train_csv = pd.DataFrame(new_data, columns=["ImageId_ClassId","EncodedPixels"])
-original_train_csv
-
-original_train_csv.to_csv("original_train.csv", index=None)
-"""
