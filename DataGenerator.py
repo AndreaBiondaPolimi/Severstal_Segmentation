@@ -46,23 +46,25 @@ def load_dataset_segmentation (preprocess_type):
 
 
 
-def load_dataset_classification (img_h, img_w, preprocess_type, batch_size=16):
+def load_dataset_classification (preprocess_type):
     train2 = util.restructure_data_frame('Severstal_Dataset\\train.csv')
     idx = int(0.8*len(train2)); print()
+
     preprocess = sm.get_preprocessing(preprocess_type)
+    shapes = ((8,256,1600),)
 
-    train_batches =  ClassificationDataGenerator(train2.iloc[:idx], img_h=img_h, img_w = img_w, shuffle=True, preprocess=preprocess, 
-                                                batch_size=batch_size, flip_h=True, flip_v=True, brightness=0.3)
+    train_batches =  ClassificationDataGenerator(train2.iloc[:idx], shuffle=True, preprocess=preprocess, shapes=shapes,
+                                                    augmentation_parameters=augmentation_parameters)
 
-    valid_batches = ClassificationDataGenerator(train2.iloc[idx:],img_h=img_h, img_w = img_w, shuffle=True, preprocess=preprocess, batch_size=batch_size)
-    
+    valid_batches = ClassificationDataGenerator(train2.iloc[idx:], shuffle=True, preprocess=preprocess)
+
     """
     iterator = iter(train_batches)
     for _ in range(20):
         images, defect = next(iterator)
 
         for i in range(len(images)):
-            image = images[i].astype(np.int16)
+            image = images[i].astype(np.uint8)
 
             print (defect[i])
             util.show_imgs((image,image),('orig','orig'),('',''))

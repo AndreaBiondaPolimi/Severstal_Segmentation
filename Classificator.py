@@ -5,9 +5,9 @@ import tensorflow as tf
 import keras
 
 from keras import backend as K
-from keras.callbacks import ModelCheckpoint
+from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
 
-def get_classification_model (input_size = (128,800,3), pretrained_weights=None, preprocess_type = 'none'):
+def get_classification_model (input_size = (None, None, 3), pretrained_weights=None, preprocess_type = 'none'):
     if (preprocess_type == 'resnet34'):
         return resent34_class_model(input_size, pretrained_weights)
         
@@ -19,11 +19,11 @@ def resent34_class_model (input_size, pretrained_weights):
 
     model = ResNet34(input_shape=input_size, weights='imagenet', include_top=False)
     x = keras.layers.GlobalAveragePooling2D()(model.output)
-    output = keras.layers.Dense(1, activation='softmax')(x)
+    output = keras.layers.Dense(1, activation='sigmoid')(x)
     model = keras.models.Model(inputs=[model.input], outputs=[output])
     
-    #adam = keras.optimizers.Adam(lr=1e-4)
-    model.compile(optimizer = 'adam', loss = 'binary_crossentropy', metrics=['accuracy'])
+    adam = keras.optimizers.Adam(lr=1e-3)
+    model.compile(optimizer = adam, loss = 'binary_crossentropy', metrics=['accuracy'])
 
     model.summary()
 
@@ -39,27 +39,19 @@ def resent34_class_model (input_size, pretrained_weights):
 def train (model, train_dataset, valid_dataset, epochs):
     callbacks = []
 
-    #es_callback = EarlyStopping(monitor='val_loss', patience=70)
-    #checkpoint_loss = ModelCheckpoint(filepath='check_val_loss{epoch:02d}.h5', monitor='val_loss',mode='min', period=1, save_best_only=True) 
-    checkpoint_dice = ModelCheckpoint(filepath='check_val_dice{epoch:02d}.h5', monitor='val_dice_coef',mode='max', period=1, save_best_only=True) 
+    checkpoint_dice = ModelCheckpoint(filepath='check_acc{epoch:02d}.h5', monitor='val_acc',mode='max', period=1, save_best_only=True) 
+    scheduler = ReduceLROnPlateau(monitor='val_loss', mode="min", patience=3, factor=0.5, verbose=True)
 
-
-    #callbacks.append(es_callback)
-    #callbacks.append(checkpoint_loss)
     callbacks.append(checkpoint_dice)
+    callbacks.append(scheduler)
 
-    
     model.fit(x=train_dataset,
           epochs=epochs,  #### set repeat in training dataset
-          steps_per_epoch=800,
+          steps_per_epoch=train_dataset.__len__(),
           validation_data=valid_dataset,
-          validation_steps=200,
-          callbacks=callbacks)
-    
-
-    #model.fit_generator(train_dataset, validation_data = valid_dataset, 
-                        #epochs = 50, verbose=1,
-                        #allbacks=callbacks)
+          validation_steps=valid_dataset.__len__(),
+          callbacks=callbacks,
+          shuffle=True)
 
     model.save('seg_final.h5')
 

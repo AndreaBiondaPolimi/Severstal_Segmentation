@@ -1,6 +1,12 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from albumentations import (
+    HorizontalFlip, IAAPerspective, ShiftScaleRotate, CLAHE, RandomRotate90,
+    Transpose, ShiftScaleRotate, Blur, OpticalDistortion, GridDistortion, HueSaturationValue,
+    IAAAdditiveGaussianNoise, GaussNoise, MotionBlur, MedianBlur, IAAPiecewiseAffine,
+    IAASharpen, IAAEmboss, RandomContrast, RandomBrightness, Flip, OneOf, Compose
+)
 
 #Show image
 def show_imgs (imgs, titles, messages):
@@ -21,6 +27,7 @@ def show_imgs (imgs, titles, messages):
     plt.tight_layout()
 
     plt.show()
+
 
 #Dataframe restructure
 def restructure_data_frame(path):
@@ -94,3 +101,77 @@ def mask2pad(mask, pad=2):
     
     return mask 
 
+
+#Data augmentation with albumentations
+def get_augmentation(augm_param):
+    affine_augmentation = Compose([
+        Flip(p=augm_param['flip_prob']),
+        ShiftScaleRotate(shift_limit=augm_param['shift_limit'], rotate_limit=augm_param['rotate_limit'], p=augm_param['shift_rot_prob']),
+    ], p=1)
+
+    color_augmentation = Compose([
+        OneOf([
+            RandomContrast(augm_param['contrast_limit']),
+            RandomBrightness(augm_param['brightness_limit']),
+        ], p=augm_param['contr_bright_prob']),
+    ], p=1)
+
+    return affine_augmentation, color_augmentation
+
+def augment(aug, image, mask=None):
+    if (mask is None):
+        data = {"image": image}
+        result = aug(**data)
+        return result['image']
+    
+    data = {"image": image, "mask": mask}
+    result = aug(**data)
+    return result['image'], result['mask']
+
+
+#Random crop generatiom
+def random_crop(img, mask, random_crop_indexes):
+    (dx, dy), (x,y) = random_crop_indexes
+
+    img_cropped = img[y:(y+dy), x:(x+dx), :]
+    if (mask is not None):
+        mask_cropped = mask[y:(y+dy), x:(x+dx)]
+    else:
+        mask_cropped = None
+    return (img_cropped, mask_cropped)
+
+def get_random_crop_indexes(original_image_size, random_crop_size, img):
+    n_tries_before_default = 5 #Try n times to get the random crop before rx/lx choice
+    height, width = original_image_size
+    dy, dx = random_crop_size
+
+    #Try to get the random crop that does not show full black image, 
+    for _ in range (n_tries_before_default):
+        x = np.random.randint(0, width - dx + 1)
+        y = np.random.randint(0, height - dy + 1)
+
+        if (not is_total_black(img, x, y, dx, dy)):
+            return ((dx, dy), (x,y))
+    #usually steel is on the right or on the left when background is present
+
+    #Try with left crop
+    x = 0
+    y = np.random.randint(0, height - dy + 1)
+    if (not is_total_black(img, x, y, dx, dy)):
+        return ((dx, dy), (x,y))
+
+    #Try with right crop
+    x = width - dx - 1
+    y = np.random.randint(0, height - dy + 1)
+
+    return ((dx, dy), (x,y))
+   
+def is_total_black(img, x, y, dx, dy):
+    cropped_img = img[y:(y+dy), x:(x+dx), :].copy()
+    #plt.imshow(cropped_img)
+    #plt.show()
+
+    cropped_img[cropped_img < 30] = 0
+    if (np.count_nonzero(cropped_img) > 0):
+        return False
+    return True
