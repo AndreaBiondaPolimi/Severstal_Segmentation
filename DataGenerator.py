@@ -8,6 +8,7 @@ import utils as util
 from keras.preprocessing.image import apply_affine_transform
 from SegmentationDataGenerator import SegmentationDataGenerator
 from ClassificationDataGenerator import ClassificationDataGenerator
+import timeit
 
 augmentation_parameters = {'flip_prob':0.5, 'shift_limit':0.1, 'rotate_limit':20, 'shift_rot_prob':0.5, 
                            'contrast_limit':0.2, 'brightness_limit':0.2, 'contr_bright_prob':0.5}
@@ -25,7 +26,7 @@ def load_dataset_segmentation (preprocess_type):
 
     valid_batches = SegmentationDataGenerator(train2.iloc[idx:], shuffle=True, preprocess=preprocess)
     
-    
+    """
     iterator = iter(train_batches)
     for _ in range(100):
         images, masks = next(iterator)
@@ -39,7 +40,7 @@ def load_dataset_segmentation (preprocess_type):
                             mask[:,:,0], mask[:,:,1],
                             mask[:,:,2], mask[:,:,3]),
                             ('orig','1','2','3','4'),('','','','',''))
-        
+    """ 
     
     return train_batches, valid_batches 
 

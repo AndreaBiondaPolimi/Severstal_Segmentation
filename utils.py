@@ -140,20 +140,27 @@ def random_crop(img, mask, random_crop_indexes):
         mask_cropped = None
     return (img_cropped, mask_cropped)
 
-def get_random_crop_indexes(original_image_size, random_crop_size, img):
-    n_tries_before_default = 5 #Try n times to get the random crop before rx/lx choice
+def get_random_crop_indexes(original_image_size, random_crop_size, img, mask):
     height, width = original_image_size
     dy, dx = random_crop_size
 
-    #Try to get the random crop that does not show full black image, 
-    for _ in range (n_tries_before_default):
+    #Try to get the random crop that contains some of the defect, if present
+    if (mask is not None) and (np.count_nonzero(mask) > 0):
+        for _ in range (30): #Try n times to get the random crop before give up
+            x = np.random.randint(0, width - dx + 1)
+            y = np.random.randint(0, height - dy + 1)
+            if (not is_total_black(mask, x, y, dx, dy, 0, 40)):
+                return ((dx, dy), (x,y))
+        
+
+    #Try to get the random crop that does not show full black image, if defect not present
+    for _ in range (5): #Try n times to get the random crop before rx/lx choice
         x = np.random.randint(0, width - dx + 1)
         y = np.random.randint(0, height - dy + 1)
-
         if (not is_total_black(img, x, y, dx, dy)):
             return ((dx, dy), (x,y))
-    #usually steel is on the right or on the left when background is present
 
+    #usually steel is on the right or on the left when background is present
     #Try with left crop
     x = 0
     y = np.random.randint(0, height - dy + 1)
@@ -166,12 +173,11 @@ def get_random_crop_indexes(original_image_size, random_crop_size, img):
 
     return ((dx, dy), (x,y))
    
-def is_total_black(img, x, y, dx, dy):
-    cropped_img = img[y:(y+dy), x:(x+dx), :].copy()
-    #plt.imshow(cropped_img)
-    #plt.show()
 
-    cropped_img[cropped_img < 30] = 0
-    if (np.count_nonzero(cropped_img) > 0):
+def is_total_black(img, x, y, dx, dy, treshold=30, quantity=0):
+    cropped_img = img[y:(y+dy), x:(x+dx), :].copy()
+
+    cropped_img[cropped_img < treshold] = 0
+    if (np.count_nonzero(cropped_img) > quantity):
         return False
     return True

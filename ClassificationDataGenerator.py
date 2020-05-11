@@ -56,20 +56,15 @@ class ClassificationDataGenerator(keras.utils.Sequence):
         X = np.empty((self.batch_size,self.img_h,self.img_w,3),dtype=np.float32)
         y = np.zeros((self.batch_size,1),dtype=np.float32)
         indexes = self.indexes[index*self.batch_size:(index+1)*self.batch_size]
+        
         for i,f in enumerate(self.df['ImageId'].iloc[indexes]):
             self.info[index*self.batch_size+i]=f
             img = np.asarray(Image.open(self.data_path + f))
-            #Generate random crop indexes
-            random_crop_indexes = util.get_random_crop_indexes((256,1600),(self.img_h,self.img_w), img)
-
             for j in range(4):
-                #Generate classification result
                 y[i][0] += rle2class(self.df['e'+str(j+1)].iloc[indexes[i]])
-                #Random Crop              
-                X[i,], _ = util.random_crop(img, None, random_crop_indexes)
-                
-            if (y[i][0] > 0):
-                y[i][0] = 1
+            y[i][0] = 1 if y[i][0] > 0 else 0    
+            random_crop_indexes = util.get_random_crop_indexes((256,1600), (self.img_h,self.img_w), img, None)
+            X[i,], _ = util.random_crop(img, None, random_crop_indexes)
             
         if self.preprocess!=None: 
             X = self.preprocess(X)

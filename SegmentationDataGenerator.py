@@ -67,7 +67,8 @@ class SegmentationDataGenerator(keras.utils.Sequence):
     def __getitem__(self, index): 
         X = np.empty((self.batch_size,self.img_h,self.img_w,3),dtype=np.float32)
         y = np.empty((self.batch_size,self.img_h,self.img_w,4),dtype=np.int8)
-
+        mask = np.empty((256,1600,4),dtype=np.int8)
+        
         if (self.use_balanced_dataset):
             df_batch = self.get_class_balanced_batch(self.batch_size)
         else:
@@ -77,10 +78,11 @@ class SegmentationDataGenerator(keras.utils.Sequence):
         for i in range (len(df_batch)):
             df = df_batch[i]
             img = np.asarray(Image.open(self.data_path + df['ImageId']))
-            random_crop_indexes = util.get_random_crop_indexes((256,1600),(self.img_h,self.img_w), img)
             for j in range(4):
-                mask = util.rle2maskResize(df['e'+str(j+1)])               
-                X[i,], y[i,:,:,j] = util.random_crop(img, mask, random_crop_indexes)
+                mask[:,:,j] = util.rle2maskResize(df['e'+str(j+1)])               
+
+            random_crop_indexes = util.get_random_crop_indexes((256,1600), (self.img_h,self.img_w), img, mask)
+            X[i,], y[i,:,:,:] = util.random_crop(img, mask, random_crop_indexes)
      
         #Data augmentation
         if (self.augmentation_parameters is not None):
@@ -116,7 +118,7 @@ class SegmentationDataGenerator(keras.utils.Sequence):
             indexes = np.random.choice(len(df), n_img_per_class, replace=True)
             for index in indexes:
                 df_batch.append(df.iloc[index])
-        shuffle(df_batch)
+        #shuffle(df_batch)
 
         return df_batch
 

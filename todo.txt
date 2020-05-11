@@ -6,7 +6,7 @@
 	2.1)epoch with different crop size (V)
 	2.2)epoch with different batch size -> to increment training speed
 	2.3)batch with balanced class (V)
-		2.3.1)center the defect in the crop
+		2.3.1)center the defect in the crop (V)
 		2.3.2)random generation using the index coming from fit_generator
 	2.4)Avoid black crops (V)
 
