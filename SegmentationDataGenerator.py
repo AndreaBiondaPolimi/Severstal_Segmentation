@@ -9,16 +9,18 @@ from keras.preprocessing.image import apply_affine_transform
 import pandas as pd
 import cv2
 import tensorflow as tf
+from random import shuffle
 
 path = 'Severstal_Dataset'
 train_path = 'Severstal_Dataset\\train_images\\images_all\\imgs\\'
 test_path = 'Severstal_Dataset\\test_images\\'
 
 class SegmentationDataGenerator(keras.utils.Sequence):
-    def __init__(self, df, shapes=((4,256,1600),), subset="train", shuffle=False, 
+    def __init__(self, df, shapes=((4,256,1600),), subset="train", shuffle=False, use_balanced_dataset='false',
                  preprocess=None, info={}, augmentation_parameters = None, fill_mode='constant'):
         super().__init__()
         self.df = df
+    
         self.shapes = shapes
         self.shape_idx = 0
 
@@ -26,6 +28,7 @@ class SegmentationDataGenerator(keras.utils.Sequence):
         self.subset = subset
         self.preprocess = preprocess
         self.info = info
+        self.use_balanced_dataset = use_balanced_dataset
 
         self.augmentation_parameters = augmentation_parameters
         self.fill_mode = fill_mode
@@ -34,6 +37,10 @@ class SegmentationDataGenerator(keras.utils.Sequence):
             self.data_path = train_path
         elif self.subset == "test":
             self.data_path = test_path
+
+        if self.use_balanced_dataset:
+            self.df_classes = self.split_class_from_dataframe()
+
         self.on_epoch_end()
 
     def __len__(self):
@@ -50,31 +57,31 @@ class SegmentationDataGenerator(keras.utils.Sequence):
         if (self.shape_idx >= len(self.shapes)):
             self.shape_idx = 0
 
-        #At each epoch shuffle indexes, if shuffle is true
-        self.indexes = np.arange(len(self.df))
-        if self.shuffle == True:
-            np.random.shuffle(self.indexes)
+        #At each epoch shuffle indexes, if shuffle is true and if not use balanced class
+        if (not self.use_balanced_dataset):
+            self.indexes = np.arange(len(self.df))
+            if self.shuffle == True:
+                np.random.shuffle(self.indexes)
     
 
     def __getitem__(self, index): 
         X = np.empty((self.batch_size,self.img_h,self.img_w,3),dtype=np.float32)
         y = np.empty((self.batch_size,self.img_h,self.img_w,4),dtype=np.int8)
-        indexes = self.indexes[index*self.batch_size:(index+1)*self.batch_size]
 
-        #Collect and crop images of the current batch
-        for i,f in enumerate(self.df['ImageId'].iloc[indexes]):
-            self.info[index*self.batch_size+i]=f
-            img = np.asarray(Image.open(self.data_path + f))
-            #Generate random crop indexes
+        if (self.use_balanced_dataset):
+            df_batch = self.get_class_balanced_batch(self.batch_size)
+        else:
+            df_batch = self.get_standard_batch(index, self.batch_size)
+
+        #Generate random crop indexes, create full resoultion mask and then crop
+        for i in range (len(df_batch)):
+            df = df_batch[i]
+            img = np.asarray(Image.open(self.data_path + df['ImageId']))
             random_crop_indexes = util.get_random_crop_indexes((256,1600),(self.img_h,self.img_w), img)
-
             for j in range(4):
-                #Generate mask
-                mask = util.rle2maskResize(self.df['e'+str(j+1)].iloc[indexes[i]])  
-                #Random Crop              
+                mask = util.rle2maskResize(df['e'+str(j+1)])               
                 X[i,], y[i,:,:,j] = util.random_crop(img, mask, random_crop_indexes)
-
-
+     
         #Data augmentation
         if (self.augmentation_parameters is not None):
             for i in range(len(X)):
@@ -90,6 +97,45 @@ class SegmentationDataGenerator(keras.utils.Sequence):
 
 
 
+    def split_class_from_dataframe(self):
+        df_0 = self.df[self.df['count'] == 0]
+        df_1 = self.df[self.df.e1.astype(bool)]
+        df_2 = self.df[self.df.e2.astype(bool)]
+        df_3 = self.df[self.df.e3.astype(bool)]
+        df_4 = self.df[self.df.e4.astype(bool)]
+
+        return df_0, df_1, df_2, df_3, df_4 
+
+
+    def get_class_balanced_batch(self, batch_size):
+        assert (batch_size % len(self.df_classes) == 0), "Batch size should be divisible by 5 for the moment"
+
+        df_batch = list()
+        n_img_per_class = int(batch_size/len(self.df_classes))
+        for df in self.df_classes:
+            indexes = np.random.choice(len(df), n_img_per_class, replace=True)
+            for index in indexes:
+                df_batch.append(df.iloc[index])
+        shuffle(df_batch)
+
+        return df_batch
+
+
+    def get_standard_batch (self, index, batch_size):
+        indexes = self.indexes[index*batch_size:(index+1)*batch_size]
+        df_batch = list()
+        for index in indexes:
+            df_batch.append(self.df.iloc[index])
+
+        return df_batch
+    
+
+
+
+
+
+
+
 
 
 
@@ -97,3 +143,17 @@ class SegmentationDataGenerator(keras.utils.Sequence):
 
     
 
+"""
+#Collect and crop images of the current batch
+for i,f in enumerate(self.df['ImageId'].iloc[indexes]):
+    self.info[index*self.batch_size+i]=f
+    img = np.asarray(Image.open(self.data_path + f))
+    #Generate random crop indexes
+    random_crop_indexes = util.get_random_crop_indexes((256,1600),(self.img_h,self.img_w), img)
+
+    for j in range(4):
+        #Generate mask
+        mask = util.rle2maskResize(self.df['e'+str(j+1)].iloc[indexes[i]])  
+        #Random Crop              
+        X[i,], y[i,:,:,j] = util.random_crop(img, mask, random_crop_indexes)
+"""

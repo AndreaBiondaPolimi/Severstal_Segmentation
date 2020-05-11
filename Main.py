@@ -10,15 +10,10 @@ def segment ():
 
     train, valid = dg.load_dataset_segmentation(preprocess_type)
     
-    
     model = seg.get_segmentation_model(preprocess_type=preprocess_type,
-                                       pretrained_weights='check_val_dice37.h5')
+                                       pretrained_weights=None)
 
-    #seg.train(model, train, valid, 100)
-
-    dg.test_model(model, preprocess_type)
-
-
+    seg.train(model, train, valid, 100)
 
 
 def classify ():
@@ -27,12 +22,22 @@ def classify ():
     train, valid = dg.load_dataset_classification(preprocess_type)
 
     model = cla.get_classification_model(preprocess_type=preprocess_type,
-                                       pretrained_weights=None)
+                                       pretrained_weights='check_acc32.h5')
 
     cla.train(model, train, valid, 50)
 
-    #dg.test_model(model, img_h, img_w, preprocess_type)
 
+def test ():
+    preprocess_type='resnet34'
 
-#segment()
-classify()
+    cla_model = cla.get_classification_model(preprocess_type=preprocess_type,
+                                       pretrained_weights='check_acc32.h5')
+
+    seg_model = seg.get_segmentation_model(preprocess_type=preprocess_type,
+                                       pretrained_weights='check_val_dice60_0.5023.h5')
+
+    dg.test_model(seg_model, cla_model, preprocess_type)
+
+segment()
+#classify()
+#test()

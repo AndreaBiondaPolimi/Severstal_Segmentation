@@ -3,10 +3,12 @@
 	1.2)Proprocessing ??? per ResnetXXX no problem, per gli altri va implmentato l'undo-rescale nella visualizzazione
 
 2)implement train on crop and valid on full (V)
-	(2.1)epoch with different crop size (V)
+	2.1)epoch with different crop size (V)
 	2.2)epoch with different batch size -> to increment training speed
-	2.3)batch with balanced class
-	(2.4)Avoid black crops (V)
+	2.3)batch with balanced class (V)
+		2.3.1)center the defect in the crop
+		2.3.2)random generation using the index coming from fit_generator
+	2.4)Avoid black crops (V)
 
 3)Use lr scheduler (V)
 
@@ -20,8 +22,14 @@ When reached a decent level of segmentation-dice (0.7)
 
 5)Pre classification stage to remove false positive (defect vs non-defect imgs)
 	5.1)implement data generator as segmentation (V)
-	5.2)if random crop implement 0/1 generation accordingly
-	5.3)implement collaborative prediction
+	5.2)if random crop, implement 0/1 generation accordingly
+	5.3)implement collaborative prediction (V)
 
 6)New Models (EfficientNet/FPN)
 7)Multi models ensamble
+
+
+
+Test effettuati
+-La classificazione sembra funzionare abbastanza bene, quasi mai non defect anche se c'è
+-Serio problema per classi sbilanciate nella segmentazione (2 e 4)

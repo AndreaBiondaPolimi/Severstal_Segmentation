@@ -20,12 +20,12 @@ def load_dataset_segmentation (preprocess_type):
     preprocess = sm.get_preprocessing(preprocess_type)
     shapes = ((10,256,256), (10,256,512), (10,256,608))
 
-    train_batches =  SegmentationDataGenerator(train2.iloc[:idx], shapes=shapes, shuffle=True, 
+    train_batches =  SegmentationDataGenerator(train2.iloc[:idx], shapes=shapes, shuffle=True, use_balanced_dataset=True,
                                                 preprocess=preprocess, augmentation_parameters=augmentation_parameters)
 
     valid_batches = SegmentationDataGenerator(train2.iloc[idx:], shuffle=True, preprocess=preprocess)
     
-    """
+    
     iterator = iter(train_batches)
     for _ in range(100):
         images, masks = next(iterator)
@@ -39,7 +39,7 @@ def load_dataset_segmentation (preprocess_type):
                             mask[:,:,0], mask[:,:,1],
                             mask[:,:,2], mask[:,:,3]),
                             ('orig','1','2','3','4'),('','','','',''))
-    """
+        
     
     return train_batches, valid_batches 
 
@@ -81,7 +81,7 @@ def load_dataset_classification (preprocess_type):
 
 
 from tqdm import tqdm
-def test_model(model, preprocess_type):
+def test_model(seg_model, cla_model, preprocess_type):
     train2 = util.restructure_data_frame('Severstal_Dataset\\test.csv')
     preprocess = sm.get_preprocessing(preprocess_type)
     bs = 2
@@ -98,28 +98,37 @@ def test_model(model, preprocess_type):
             image = images[i].astype(np.int16)
             mask = masks[i]
 
-        
-            mask = mask * 255
+            
             util.show_imgs((image,
                             mask[:,:,0], mask[:,:,1],
                             mask[:,:,2], mask[:,:,3]),
                             ('orig','1','2','3','4'),('','','','',''))
             
+            
+            #Predict if the current image is defective or not
+            cls_res = cla_model.predict(np.reshape(image,(1,256,1600,3)))
 
+            #If it is most probable defective, the result is a whole zero mask
+            if (cls_res < 0.5):
+                res = np.zeros((256,1600,4),dtype=np.int8)
 
-            res = model.predict(np.reshape(image,(1,256,1600,3)))
-            res = np.reshape(res,(256,1600,4))
-            #res[np.where(res < 0.5)] = 0
-            #res[np.where(res >= 0.5)] = 1
+            #Otherwise apply segmentation 
+            else:
+                res = seg_model.predict(np.reshape(image,(1,256,1600,3)))
+                
+                res = np.reshape(res,(256,1600,4))
+                res[np.where(res < 0.5)] = 0
+                res[np.where(res >= 0.5)] = 1
 
+            #Update dice value
             dice_res += dice_coef(mask.astype(np.uint8), res.astype(np.uint8))
+            coef = dice_coef(mask.astype(np.uint8), res.astype(np.uint8))
             
             
-            #res = res * 255
             util.show_imgs((image,
                             res[:,:,0], res[:,:,1],
                             res[:,:,2], res[:,:,3]),
-                            ('orig','1','2','3','4'),('','','','',''))
+                            (str(coef),'1','2','3','4'),('','','','',''))
             
 
     print (dice_res/(n_samples*bs))
