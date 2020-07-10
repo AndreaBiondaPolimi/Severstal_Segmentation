@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import matplotlib.patches as mpatches
 from albumentations import (
     HorizontalFlip, IAAPerspective, ShiftScaleRotate, CLAHE, RandomRotate90,
     Transpose, ShiftScaleRotate, Blur, OpticalDistortion, GridDistortion, HueSaturationValue,
@@ -8,7 +9,7 @@ from albumentations import (
     IAASharpen, IAAEmboss, RandomContrast, RandomBrightness, Flip, OneOf, Compose
 )
 
-#Show image
+#Show images
 def show_imgs (imgs, titles, messages):
     n_img = len(imgs)
     _ , axarr = plt.subplots(n_img)
@@ -24,6 +25,60 @@ def show_imgs (imgs, titles, messages):
 
     fig = plt.gcf()
     fig.set_size_inches(14, 8, forward=True)
+    plt.tight_layout()
+
+    plt.show()
+
+def show_img_over_def (img, mask):
+    plt.figure(figsize=(14,2)) #20,18
+    extra = '  has defect'
+    for j in range(4):
+        msk = mask[:,:,j]
+        msk = mask2pad(msk,pad=3)
+        msk = mask2contour(msk,width=4)
+        if np.sum(msk)!=0: extra += ' '+str(j+1)
+        if j==0: # yellow
+            img[msk==1,0] = 235 
+            img[msk==1,1] = 235
+        elif j==1: img[msk==1,1] = 210 # green
+        elif j==2: img[msk==1,2] = 255 # blue
+        elif j==3: # magenta
+            img[msk==1,0] = 255
+            img[msk==1,2] = 255
+
+    yellow_patch = mpatches.Patch(color='yellow', label='Defect 1')
+    green_patch = mpatches.Patch(color='green', label='Defect 2')
+    blue_patch = mpatches.Patch(color='blue', label='Defect 3')
+    red_patch = mpatches.Patch(color='magenta', label='Defect 4')
+    plt.legend(handles=[yellow_patch, green_patch, blue_patch, red_patch])
+
+    plt.axis('off') 
+    plt.imshow(img)
+    
+    plt.show()
+
+def show_img_and_def (images, titles):
+    _ , axarr = plt.subplots(len(images))
+
+    for i in range (len(images)):
+        img = images[i]
+        title = titles[i]
+        if i == 0:
+            axarr[i].imshow(img)
+        else:
+            mask = mask2view(img)
+            axarr[i].imshow(mask)
+        
+        axarr[i].set_title(title)
+        
+
+    fig = plt.gcf()
+    fig.set_size_inches(14, 8, forward=True)
+    yellow_patch = mpatches.Patch(color='yellow', label='Defect 1')
+    green_patch = mpatches.Patch(color='green', label='Defect 2')
+    blue_patch = mpatches.Patch(color='blue', label='Defect 3')
+    red_patch = mpatches.Patch(color='red', label='Defect 4')
+    plt.legend(handles=[yellow_patch, green_patch, blue_patch, red_patch])
     plt.tight_layout()
 
     plt.show()
@@ -67,6 +122,8 @@ def rle2maskResize(rle):
 
     return mask.reshape( (height,width), order='F' )
 
+
+#Mask visualization
 def mask2contour(mask, width=3):
     # CONVERT MASK TO ITS CONTOUR
     w = mask.shape[1]
@@ -100,6 +157,32 @@ def mask2pad(mask, pad=2):
         mask = np.logical_or(mask,temp)
     
     return mask 
+
+def mask2view(mask):
+    view = np.zeros((mask.shape[0],mask.shape[1],3), dtype=np.uint8)
+    for j in range(4):
+        layer = mask[:,:,j]
+        if (j==0):  #yellow
+            view[:,:,0] = view[:,:,0] + (layer.astype(np.uint8))*255
+            view[:,:,1] = view[:,:,1] + (layer.astype(np.uint8))*255
+            view[:,:,2] = view[:,:,2] + (layer.astype(np.uint8))*0
+        
+        if (j==1):  #yellow
+            view[:,:,0] = view[:,:,0] + (layer.astype(np.uint8))*0
+            view[:,:,1] = view[:,:,1] + (layer.astype(np.uint8))*255
+            view[:,:,2] = view[:,:,2] + (layer.astype(np.uint8))*0
+        
+        if (j==2):  #yellow
+            view[:,:,0] = view[:,:,0] + (layer.astype(np.uint8))*0
+            view[:,:,1] = view[:,:,1] + (layer.astype(np.uint8))*0
+            view[:,:,2] = view[:,:,2] + (layer.astype(np.uint8))*255
+
+        if (j==3):  #yellow
+            view[:,:,0] = view[:,:,0] + (layer.astype(np.uint8))*255
+            view[:,:,1] = view[:,:,1] + (layer.astype(np.uint8))*0
+            view[:,:,2] = view[:,:,2] + (layer.astype(np.uint8))*0
+
+    return view
 
 
 #Data augmentation with albumentations
@@ -173,7 +256,6 @@ def get_random_crop_indexes(original_image_size, random_crop_size, img, mask):
 
     return ((dx, dy), (x,y))
    
-
 def is_total_black(img, x, y, dx, dy, treshold=30, quantity=0):
     cropped_img = img[y:(y+dy), x:(x+dx), :].copy()
 

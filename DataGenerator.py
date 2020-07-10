@@ -19,7 +19,7 @@ def load_dataset_segmentation (preprocess_type):
     idx = int(0.8*len(train2)); print()
 
     preprocess = sm.get_preprocessing(preprocess_type)
-    shapes = ((10,256,256), (10,256,512), (10,256,608))
+    shapes = ((5,256,256),)
 
     train_batches =  SegmentationDataGenerator(train2.iloc[:idx], shapes=shapes, shuffle=True, use_balanced_dataset=True,
                                                 preprocess=preprocess, augmentation_parameters=augmentation_parameters)
@@ -30,17 +30,12 @@ def load_dataset_segmentation (preprocess_type):
     iterator = iter(train_batches)
     for _ in range(100):
         images, masks = next(iterator)
-        masks = masks * 255
 
         for i in range(len(images)):
             image = images[i].astype(np.int16)
             mask = masks[i]
-
-            util.show_imgs((image,
-                            mask[:,:,0], mask[:,:,1],
-                            mask[:,:,2], mask[:,:,3]),
-                            ('orig','1','2','3','4'),('','','','',''))
-    """ 
+            util.show_img_and_def((image, mask, ('orig','mask'))
+    """
     
     return train_batches, valid_batches 
 
@@ -97,39 +92,29 @@ def test_model(seg_model, cla_model, preprocess_type):
 
         for i in range(len(images)):
             image = images[i].astype(np.int16)
-            mask = masks[i]
-
-            
-            util.show_imgs((image,
-                            mask[:,:,0], mask[:,:,1],
-                            mask[:,:,2], mask[:,:,3]),
-                            ('orig','1','2','3','4'),('','','','',''))
-            
+            mask = masks[i]            
             
             #Predict if the current image is defective or not
             cls_res = cla_model.predict(np.reshape(image,(1,256,1600,3)))
 
             #If it is most probable defective, the result is a whole zero mask
+            
             if (cls_res < 0.5):
-                res = np.zeros((256,1600,4),dtype=np.int8)
+                res = np.zeros((256,1600,4),dtype=np.uint8)
 
             #Otherwise apply segmentation 
             else:
                 res = seg_model.predict(np.reshape(image,(1,256,1600,3)))
-                
                 res = np.reshape(res,(256,1600,4))
-                res[np.where(res < 0.5)] = 0
-                res[np.where(res >= 0.5)] = 1
+
+            res[np.where(res < 0.5)] = 0
+            res[np.where(res >= 0.5)] = 1
 
             #Update dice value
             dice_res += dice_coef(mask.astype(np.uint8), res.astype(np.uint8))
+            
             coef = dice_coef(mask.astype(np.uint8), res.astype(np.uint8))
-            
-            
-            util.show_imgs((image,
-                            res[:,:,0], res[:,:,1],
-                            res[:,:,2], res[:,:,3]),
-                            (str(coef),'1','2','3','4'),('','','','',''))
+            #util.show_img_and_def((image, mask, res), ('orig','mask','pred ' + str(coef)))
             
 
     print (dice_res/(n_samples*bs))

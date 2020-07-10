@@ -1,7 +1,10 @@
 # Severstal_Segmentation
 
-1)Load mask with multiple channel (one for each class)
-	1.1)Masks related to the same image must be merged
-2)Create the generator
-3)Create the model (unet with multiple classes)
-4)Train
+1. Test results with efficientnet preprocessing (viewing part of test)
+2. Test with 2 preprocessing functions (use efficientnet also for classification)
+3. Test classification network results
+4. Prepare presentation with open questions
+	1. Train on crop, infer on complete
+	2. Sigmoid vs Softmax
+	3. Classification (full) + Segmentation (crop) in cascade
+	4. Too small batch size
