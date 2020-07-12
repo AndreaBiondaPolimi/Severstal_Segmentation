@@ -4,8 +4,8 @@ import tensorflow as tf
 import DataGenerator as dg
 import Classificator as cla
 
-preprocess_type='resnet34'
-#preprocess_type='efficientnetb3'
+#preprocess_type='resnet34'
+preprocess_type='efficientnetb3'
 
 def segment ():
     train, valid = dg.load_dataset_segmentation(preprocess_type)
@@ -30,9 +30,9 @@ def test ():
                                        pretrained_weights='check_acc32.h5')
 
     seg_model = seg.get_segmentation_model(preprocess_type=preprocess_type,
-                                       pretrained_weights='check_val_dice_0.65_resnet.h5')
+                                       pretrained_weights='check_val_dice06_0.6.h5')
 
-    dg.test_model(seg_model, cla_model, preprocess_type)
+    dg.test_model(seg_model, cla_model, seg_preprocess_type=preprocess_type, cls_preprocess_type='resnet34')
 
 #segment()
 #classify()

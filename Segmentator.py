@@ -26,7 +26,7 @@ def resent34_seg_model (input_size, pretrained_weights):
     #loss = bce_jaccard_loss
 
     adam = keras.optimizers.Adam(lr=1e-5)
-    adam = runai.ga.keras.optimizers.Optimizer(adam, steps=3)
+    #adam = runai.ga.keras.optimizers.Optimizer(adam, steps=3)
 
     model.compile(optimizer = adam, loss = loss , metrics=[dice_coef])
 

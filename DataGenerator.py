@@ -77,12 +77,13 @@ def load_dataset_classification (preprocess_type):
 
 
 from tqdm import tqdm
-def test_model(seg_model, cla_model, preprocess_type):
+def test_model(seg_model, cla_model, seg_preprocess_type, cls_preprocess_type):
     train2 = util.restructure_data_frame('Severstal_Dataset\\test.csv')
-    preprocess = sm.get_preprocessing(preprocess_type)
+    seg_preprocess = sm.get_preprocessing(seg_preprocess_type)
+    cls_preprocess = sm.get_preprocessing(cls_preprocess_type)
     bs = 2
     
-    test_batches = SegmentationDataGenerator(train2, preprocess=preprocess, shapes=((bs,256,1600),), subset='test')
+    test_batches = SegmentationDataGenerator(train2, shapes=((bs,256,1600),), subset='test')
 
     n_samples = test_batches.__len__()
     dice_res = 0
@@ -92,10 +93,13 @@ def test_model(seg_model, cla_model, preprocess_type):
 
         for i in range(len(images)):
             image = images[i].astype(np.int16)
-            mask = masks[i]            
-            
+            mask = masks[i]    
+
+            seg_x = seg_preprocess(image)          
+            cls_x = cls_preprocess(image)          
+               
             #Predict if the current image is defective or not
-            cls_res = cla_model.predict(np.reshape(image,(1,256,1600,3)))
+            cls_res = cla_model.predict(np.reshape(cls_x,(1,256,1600,3)))
 
             #If it is most probable defective, the result is a whole zero mask
             
@@ -104,7 +108,7 @@ def test_model(seg_model, cla_model, preprocess_type):
 
             #Otherwise apply segmentation 
             else:
-                res = seg_model.predict(np.reshape(image,(1,256,1600,3)))
+                res = seg_model.predict(np.reshape(seg_x,(1,256,1600,3)))
                 res = np.reshape(res,(256,1600,4))
 
             res[np.where(res < 0.5)] = 0

@@ -16,7 +16,7 @@ train_path = 'Severstal_Dataset\\train_images\\images_all\\imgs\\'
 test_path = 'Severstal_Dataset\\test_images\\'
 
 class SegmentationDataGenerator(keras.utils.Sequence):
-    def __init__(self, df, shapes=((4,256,1600),), subset="train", shuffle=False, use_balanced_dataset=False,
+    def __init__(self, df, shapes=((1,256,1600),), subset="train", shuffle=False, use_balanced_dataset=False,
                  preprocess=None, info={}, augmentation_parameters = None, fill_mode='constant'):
         super().__init__()
         self.df = df
