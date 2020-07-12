@@ -29,10 +29,11 @@ def test ():
     cla_model = cla.get_classification_model(preprocess_type='resnet34',
                                        pretrained_weights='check_acc32.h5')
 
-    seg_model = seg.get_segmentation_model(preprocess_type=preprocess_type,
-                                       pretrained_weights='check_val_dice06_0.6.h5')
+    #seg_model = seg.get_segmentation_model(preprocess_type=preprocess_type,
+                                       #pretrained_weights='check_val_dice06_0.6.h5')
 
-    dg.test_model(seg_model, cla_model, seg_preprocess_type=preprocess_type, cls_preprocess_type='resnet34')
+    #dg.test_model(seg_model, cla_model, seg_preprocess_type=preprocess_type, cls_preprocess_type='resnet34')
+    dg.fulltest_classification_model (cla_model, cls_preprocess_type='resnet34')
 
 #segment()
 #classify()
