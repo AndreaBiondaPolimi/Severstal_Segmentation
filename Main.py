@@ -27,13 +27,13 @@ def classify ():
 
 
 def test ():
-    cla_model = cla.get_classification_model(preprocess_type='resnet50',
-                                       pretrained_weights='check_acc25_0.916_resnet50_lr10-5.h5')
+    cla_model = cla.get_classification_model(preprocess_type='resnet34',
+                                       pretrained_weights='check_acc_0.55_resnet34.h5')
 
-    seg_model = seg.get_segmentation_model(preprocess_type='resnet34',
-                                       pretrained_weights='check_val_dice_0.65_resnet.h5')
+    seg_model = seg.get_segmentation_model(preprocess_type='efficientnetb3',
+                                       pretrained_weights='check_val_dice_0.65_effb3.h5')
 
-    dg.test_model(seg_model, cla_model, seg_preprocess_type='resnet34', cls_preprocess_type='resnet50')
+    dg.test_model(seg_model, cla_model, seg_preprocess_type='efficientnetb3', cls_preprocess_type='resnet50')
     #dg.fulltest_classification_model (cla_model, cls_preprocess_type='resnet50')
 
 #segment()

@@ -103,7 +103,7 @@ def test_model(seg_model, cla_model, seg_preprocess_type, cls_preprocess_type):
 
             #If it is most probable defective, the result is a whole zero mask
             
-            if (cls_res < 0):
+            if (cls_res < 0.5):
                 res = np.zeros((256,1600,4),dtype=np.uint8)
 
             #Otherwise apply segmentation 
