@@ -47,7 +47,7 @@ def load_dataset_classification (preprocess_type):
     idx = int(0.8*len(train2)); print()
 
     preprocess = sm.get_preprocessing(preprocess_type)
-    shapes = ((8,256,1600),)
+    shapes = ((4,256,1600),)
 
     train_batches =  ClassificationDataGenerator(train2.iloc[:idx], shuffle=True, preprocess=preprocess, shapes=shapes,
                                                     augmentation_parameters=augmentation_parameters)
@@ -103,7 +103,7 @@ def test_model(seg_model, cla_model, seg_preprocess_type, cls_preprocess_type):
 
             #If it is most probable defective, the result is a whole zero mask
             
-            if (cls_res < 0.5):
+            if (cls_res < 0):
                 res = np.zeros((256,1600,4),dtype=np.uint8)
 
             #Otherwise apply segmentation 
@@ -117,7 +117,7 @@ def test_model(seg_model, cla_model, seg_preprocess_type, cls_preprocess_type):
             #Update dice value
             dice_res += dice_coef(mask.astype(np.uint8), res.astype(np.uint8))
             
-            coef = dice_coef(mask.astype(np.uint8), res.astype(np.uint8))
+            #coef = dice_coef(mask.astype(np.uint8), res.astype(np.uint8))
             #util.show_img_and_def((image, mask, res), ('orig','mask','pred ' + str(coef)))  
 
     print (dice_res/(n_samples*bs))

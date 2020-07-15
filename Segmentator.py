@@ -11,7 +11,7 @@ def get_segmentation_model (input_size = (None, None, 3), pretrained_weights=Non
     if (preprocess_type == 'resnet34'):
         return resent34_seg_model(input_size, pretrained_weights)
     elif (preprocess_type == 'efficientnetb3'):
-        return efficientnetb4_seg_model(input_size, pretrained_weights)
+        return efficientnetb3_seg_model(input_size, pretrained_weights)
         
 
 from segmentation_models import Unet
@@ -38,7 +38,7 @@ def resent34_seg_model (input_size, pretrained_weights):
     return model
 
 
-def efficientnetb4_seg_model (input_size, pretrained_weights):
+def efficientnetb3_seg_model (input_size, pretrained_weights):
     model = FPN('efficientnetb3', encoder_weights='imagenet', input_shape=input_size, classes=4, activation='sigmoid')
 
     adam = keras.optimizers.Adam(lr=1e-4)
