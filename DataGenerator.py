@@ -14,17 +14,19 @@ augmentation_parameters = {'flip_prob':0.5, 'shift_limit':0.1, 'rotate_limit':20
                            'contrast_limit':0.2, 'brightness_limit':0.2, 'contr_bright_prob':0.5}
 
 import segmentation_models as sm
-def load_dataset_segmentation (preprocess_type):
+def load_dataset_segmentation (preprocess_type, use_defective_only = False):
     train2 = util.restructure_data_frame('Severstal_Dataset\\train.csv')
-    idx = int(0.8*len(train2)); print()
+    if (use_defective_only):
+        train2 = util.get_defective_data_frame(train2)
+    train_idxs, valid_idxs = util.get_random_split(train2)
 
     preprocess = sm.get_preprocessing(preprocess_type)
     shapes = ((5,256,256),)
 
-    train_batches =  SegmentationDataGenerator(train2.iloc[:idx], shapes=shapes, shuffle=True, use_balanced_dataset=True,
+    train_batches =  SegmentationDataGenerator(train2.iloc[train_idxs], shapes=shapes, shuffle=True, use_balanced_dataset=True,
                                                 preprocess=preprocess, augmentation_parameters=augmentation_parameters)
 
-    valid_batches = SegmentationDataGenerator(train2.iloc[idx:], shuffle=True, preprocess=preprocess)
+    valid_batches = SegmentationDataGenerator(train2.iloc[valid_idxs], shuffle=True, preprocess=preprocess)
     
     """
     iterator = iter(train_batches)
@@ -151,7 +153,7 @@ def fulltest_classification_model (cls_model, cls_preprocess_type):
 
 
 
-from tensorflow.keras import backend as K
+from keras import backend as K
 def dice_coef(y_true, y_pred, smooth=1):
     y_true_f = y_true.flatten()
     y_pred_f = y_pred.flatten()

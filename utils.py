@@ -104,6 +104,18 @@ def restructure_data_frame(path):
     return train2
 
 
+def get_random_split (train2, p = 0.8):
+    valid_idxs = np.random.choice( a=[False, True], size=(len(train2)), p=[p, 1-p])
+    train_idxs = np.logical_not(valid_idxs)
+    
+    return train_idxs, valid_idxs
+
+
+def get_defective_data_frame (train2):
+    return train2.loc[train2['count'] > 0]
+
+
+
 #Mask creation
 def rle2maskResize(rle):
     height= 256
