@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 20.6.29) (preloaded format=pdflatex 2020.7.21)  25 JUL 2020 15:18
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 20.6.29) (preloaded format=pdflatex 2020.7.21)  25 JUL 2020 23:43
 entering extended mode
 **c:/Users/Andrea/Desktop/Severstal_Segmentation/egpaper_final.tex
 (c:/Users/Andrea/Desktop/Severstal_Segmentation/egpaper_final.tex
@@ -312,8 +312,22 @@ LaTeX Font Info:    Trying to load font information for OT1+pcr on input line 35
  (C:\Users\Andrea\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\ot1pcr.fd
 File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
 )
-LaTeX Font Info:    Trying to load font information for TS1+ptm on input line 47.
- (C:\Users\Andrea\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\ts1ptm.fd
+Underfull \hbox (badness 2582) in paragraph at lines 38--42
+\OT1/ptm/m/it/10 re-quires the de-vel-op-ment of even more tech-no-log-i-cal
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 38--42
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 44--45
+
+ []
+
+LaTeX Font Info:    Trying to load font information for TS1+ptm on input line 56.
+(C:\Users\Andrea\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\ts1ptm.fd
 File: ts1ptm.fd 2001/06/04 font definitions for TS1/ptm.
 ) [1{C:/Users/Andrea/AppData/Local/MiKTeX/pdftex/config/pdftex.map}
 
@@ -363,28 +377,28 @@ Underfull \hbox (badness 10000) in paragraph at lines 25--25
  []
 
 )
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 200.
- [3]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 200.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 209.
+ [3] [4]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 209.
  (egpaper_final.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 200.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 200.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 209.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 209.
 Package rerunfilecheck Info: File `egpaper_final.brf' has not changed.
-(rerunfilecheck)             Checksum: 86FA9FB31C0491877615983F7C7FFCD0;138.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 200.
+(rerunfilecheck)             Checksum: 439482991F678626B362634E26D40F04;138.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 209.
  ) 
 Here is how much of TeX's memory you used:
- 6863 strings out of 481225
- 103394 string characters out of 2905705
- 370115 words of memory out of 3000000
+ 6864 strings out of 481225
+ 103400 string characters out of 2905705
+ 371115 words of memory out of 3000000
  22248 multiletter control sequences out of 15000+200000
  563421 words of font info for 91 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
  56i,12n,45p,779b,344s stack positions out of 5000i,500n,10000p,200000b,50000s
 {C:/Users/Andrea/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/base/8r.enc}<C:/Users/Andrea/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi9.pfb><C:/Users/Andrea/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr9.pfb><C:/Users/Andrea/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/Andrea/AppData/Local/Programs/MiKTeX/fonts/type1/urw/courier/ucrr8a.pfb><C:/Users/Andrea/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmb8a.pfb><C:/Users/Andrea/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmr8a.pfb><C:/Users/Andrea/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmri8a.pfb>
-Output written on egpaper_final.pdf (3 pages, 104234 bytes).
+Output written on egpaper_final.pdf (4 pages, 106749 bytes).
 PDF statistics:
- 88 PDF objects out of 1000 (max. 8388607)
- 30 named destinations out of 1000 (max. 500000)
+ 93 PDF objects out of 1000 (max. 8388607)
+ 31 named destinations out of 1000 (max. 500000)
  1 words of extra memory for PDF output out of 10000 (max. 10000000)
 
