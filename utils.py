@@ -241,7 +241,7 @@ def get_random_crop_indexes(original_image_size, random_crop_size, img, mask):
 
     #Try to get the random crop that contains some of the defect, if present
     if (mask is not None) and (np.count_nonzero(mask) > 0):
-        for _ in range (30): #Try n times to get the random crop before give up
+        for _ in range (10): #Try n times to get the random crop before give up
             x = np.random.randint(0, width - dx + 1)
             y = np.random.randint(0, height - dy + 1)
             if (not is_total_black(mask, x, y, dx, dy, 0, 40)):

@@ -21,9 +21,9 @@ def load_dataset_segmentation (preprocess_type, use_defective_only = False):
     train_idxs, valid_idxs = util.get_random_split(train2)
 
     preprocess = sm.get_preprocessing(preprocess_type)
-    shapes = ((5,256,256),)
+    shapes = ((4,256,256),(4,256,384))
 
-    train_batches =  SegmentationDataGenerator(train2.iloc[train_idxs], shapes=shapes, shuffle=True, use_balanced_dataset=True,
+    train_batches =  SegmentationDataGenerator(train2.iloc[train_idxs], shapes=shapes, shuffle=True, use_balanced_dataset=False,
                                                 preprocess=preprocess, augmentation_parameters=augmentation_parameters)
 
     valid_batches = SegmentationDataGenerator(train2.iloc[valid_idxs], shuffle=True, preprocess=preprocess)
@@ -36,7 +36,7 @@ def load_dataset_segmentation (preprocess_type, use_defective_only = False):
         for i in range(len(images)):
             image = images[i].astype(np.int16)
             mask = masks[i]
-            util.show_img_and_def((image, mask, ('orig','mask'))
+            util.show_img_and_def((image, mask) , ('orig','mask'))
     """
     
     return train_batches, valid_batches 

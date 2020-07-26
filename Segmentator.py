@@ -42,7 +42,6 @@ def efficientnetb3_seg_model (input_size, pretrained_weights):
     model = FPN('efficientnetb3', encoder_weights='imagenet', input_shape=input_size, classes=4, activation='sigmoid')
 
     adam = keras.optimizers.Adam(lr=1e-4)
-    #model.compile(optimizer = 'adam', loss = 'binary_crossentropy', metrics=[dice_coef])
     model.compile(optimizer = adam, loss = bce_dice_loss , metrics=[dice_coef])
     #model.compile(optimizer = adam, loss = lovasz_loss , metrics=[dice_coef])
 
