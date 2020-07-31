@@ -3,6 +3,7 @@ import os
 import numpy as np
 import tensorflow as tf
 import keras
+import utils as util
 
 from keras import backend as K
 from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
@@ -85,6 +86,52 @@ def train (model, train_dataset, valid_dataset, epochs):
     model.save('seg_final.h5')
 
 
+from tqdm import tqdm
+import segmentation_models as sm
+def search_segmentation_treshold (valid_batches, seg_model, activation, preprocess_type):
+    n_samples = valid_batches.__len__()
+    classes = 4 if activation == 'sigmoid' else 5
+    
+    defects = [0, 1, 2 ,3]
+    tresholds = [0.3, 0.4, 0.5 ,0.6, 0.7]
+
+    for defect in defects:
+        for treshold in tresholds:           
+            dice_res = 0
+            iterator = iter(valid_batches)
+            for _ in tqdm(range(n_samples)):
+                images, masks = next(iterator)
+
+                for i in range(len(images)):
+                    image = images[i].astype(np.int16)
+                    mask = masks[i]                 
+
+                    seg_preprocess = sm.get_preprocessing(preprocess_type)
+                    seg_x = seg_preprocess(image)   
+
+                    res = seg_model.predict(np.reshape(seg_x,(1,256,1600,3)))
+                    res = np.reshape(res,(256,1600,classes))
+                    tot  = np.zeros_like (res)
+
+                    mask_defect = res[:,:,defect]
+                    mask_defect[np.where(mask_defect < treshold)] = 0
+                    mask_defect[np.where(mask_defect >= treshold)] = 1
+
+                    tot [:,:,defect] = mask_defect
+
+                    res[np.where(res < 0.5)] = 0
+                    res[np.where(res >= 0.5)] = 1
+
+
+                    #Update dice value
+                    dice_res += dice_coef_test(mask.astype(np.uint8), tot.astype(np.uint8))
+                    
+                    coef = dice_coef_test(mask.astype(np.uint8), tot.astype(np.uint8))
+                    util.show_img_and_def((image, mask, tot), ('orig','mask','pred ' + str(coef)))
+
+            print()
+            print('Search for defect', defect, 'with treshold', treshold, 'dice', dice_res)
+
 
 
 
@@ -106,4 +153,14 @@ def dice_loss(y_true, y_pred):
 def bce_dice_loss(y_true, y_pred):
     #return tf.keras.losses.binary_crossentropy(y_true, y_pred) + dice_loss(y_true, y_pred)
     return tf.keras.losses.binary_crossentropy(y_true, y_pred) + dice_loss(y_true, y_pred)
+
+
+
+
+def dice_coef_test(y_true, y_pred, smooth=1):  
+    y_true_f = y_true[:,:,:4].flatten()
+    y_pred_f = y_pred[:,:,:4].flatten()
+    intersection = np.sum(y_true_f * y_pred_f)
+    ret = (2 * intersection + smooth) / (np.sum(y_true_f) + np.sum(y_pred_f) + smooth)
+    return ret
 

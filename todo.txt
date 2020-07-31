@@ -13,19 +13,19 @@
 3)Use lr scheduler (V)
 4)Different loss (dice+bce / lovasz / jaccard / tversky)
 5)Implement softmax (V)
-6)Accumulate gradients in batch
-
+6)Accumulate gradients in batch (X)
 
 
 When reached a decent level of segmentation-dice (0.7)
 
 
-5)Pre classification stage to remove false positive (defect vs non-defect imgs) (V)
+7)Pre classification stage to remove false positive (defect vs non-defect imgs) (V)
 	5.1)implement data generator as segmentation (V)
 	5.2)if random crop, implement 0/1 generation accordingly
 	5.3)implement collaborative prediction (V)
 	5.4)Check accuracy matrix (V)
 
-6)New Models (EfficientNet/FPN/ResUnet)
-7)Wipe out blobs not bigger than a treshold
-8)Use bigger and rectangular images
+8)New Models (EfficientNet/FPN/ResUnet)
+9)Wipe out small blobs (X)
+10)Use bigger and rectangular images
+11)Use different treshold for defects

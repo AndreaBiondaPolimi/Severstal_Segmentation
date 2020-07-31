@@ -23,7 +23,7 @@ def load_dataset_segmentation (preprocess_type, use_defective_only = False, acti
         train2 = util.get_defective_data_frame(train2)
     train_idxs, valid_idxs = util.get_random_split(train2)
 
-    #preprocess = sm.get_preprocessing(preprocess_type)
+    preprocess = sm.get_preprocessing(preprocess_type)
     preprocess = None
 
     if (use_defective_only):
@@ -40,17 +40,17 @@ def load_dataset_segmentation (preprocess_type, use_defective_only = False, acti
                                                 shuffle=True, preprocess=preprocess)
     
     """
-    iterator = iter(train_batches)
+    iterator = iter(valid_batches)
     for _ in range(100):
         images, masks = next(iterator)
 
         for i in range(len(images)):
             image = images[i].astype(np.int16)
             mask = masks[i]
-            #util.show_img_and_def((image, mask) , ('orig','mask'))
+            util.show_img_and_def((image, mask) , ('orig','mask'))
             
-            util.show_imgs((image, mask[:,:,0], mask[:,:,1], mask[:,:,2], mask[:,:,3], mask[:,:,4]),
-                            ('img', '0', '1', '2', '3', '4'), ('','','','','',''))
+            #util.show_imgs((image, mask[:,:,0], mask[:,:,1], mask[:,:,2], mask[:,:,3], mask[:,:,4]),
+                            #('img', '0', '1', '2', '3', '4'), ('','','','','',''))
 
             #util.show_imgs((image, mask[:,:,0], mask[:,:,1], mask[:,:,2], mask[:,:,3]),
                             #('img', '0', '1', '2', '3'), ('','','','',''))
@@ -96,11 +96,12 @@ def load_dataset_classification (preprocess_type):
 
 
 from tqdm import tqdm
-def test_model(seg_model, cla_model, seg_preprocess_type, cls_preprocess_type):
+def test_model(seg_model, cla_model, seg_preprocess_type, cls_preprocess_type, activation):
     train2 = util.restructure_data_frame('Severstal_Dataset\\test.csv')
     seg_preprocess = sm.get_preprocessing(seg_preprocess_type)
     cls_preprocess = sm.get_preprocessing(cls_preprocess_type)
-    bs = 2
+    bs = 1
+    classes = 4 if activation == 'sigmoid' else 5
     
     test_batches = SegmentationDataGenerator(train2, shapes=((bs,256,1600),), subset='test')
 
@@ -117,19 +118,19 @@ def test_model(seg_model, cla_model, seg_preprocess_type, cls_preprocess_type):
             seg_x = seg_preprocess(image)          
             cls_x = cls_preprocess(image)          
                
-            
             #Predict if the current image is defective or not
             cls_res = cla_model.predict(np.reshape(cls_x,(1,256,1600,3)))
 
             #If it is most probable defective, the result is a whole zero mask
             if (cls_res < 0.5):
-                res = np.zeros((256,1600,5),dtype=np.uint8)
-                res[:,:,4] = 1
+                res = np.zeros((256,1600,classes),dtype=np.uint8)
+                if classes == 5:
+                    res[:,:,4] = 1
 
             #Otherwise apply segmentation 
             else:
                 res = seg_model.predict(np.reshape(seg_x,(1,256,1600,3)))
-                res = np.reshape(res,(256,1600,5))
+                res = np.reshape(res,(256,1600,classes))
 
             res[np.where(res < 0.5)] = 0
             res[np.where(res >= 0.5)] = 1
@@ -137,8 +138,8 @@ def test_model(seg_model, cla_model, seg_preprocess_type, cls_preprocess_type):
             #Update dice value
             dice_res += dice_coef(mask.astype(np.uint8), res.astype(np.uint8))
             
-            #coef = dice_coef(mask.astype(np.uint8), res.astype(np.uint8))
-            #util.show_img_and_def((image, mask, res), ('orig','mask','pred ' + str(coef)))  
+            coef = dice_coef(mask.astype(np.uint8), res.astype(np.uint8))
+            util.show_img_and_def((image, mask, res), ('orig','mask','pred ' + str(coef)))  
 
     print (dice_res/(n_samples*bs))
 
@@ -171,7 +172,7 @@ def fulltest_classification_model (cls_model, cls_preprocess_type):
 
 
 
-from keras import backend as K
+
 def dice_coef(y_true, y_pred, smooth=1):
     y_true_f = y_true[:,:,:4].flatten()
     y_pred_f = y_pred[:,:,:4].flatten()
