@@ -17,7 +17,7 @@ test_path = 'Severstal_Dataset\\test_images\\'
 
 class SegmentationDataGenerator(keras.utils.Sequence):
     def __init__(self, df, shapes=((1,256,1600),), subset="train", shuffle=False, use_balanced_dataset=False,
-                 preprocess=None, info={}, augmentation_parameters = None, fill_mode='constant'):
+                 preprocess=None, info={}, augmentation_parameters = None, use_defective_only=False):
         super().__init__()
         self.df = df
     
@@ -31,7 +31,6 @@ class SegmentationDataGenerator(keras.utils.Sequence):
         self.use_balanced_dataset = use_balanced_dataset
 
         self.augmentation_parameters = augmentation_parameters
-        self.fill_mode = fill_mode
 
         if self.subset == "train":
             self.data_path = train_path
@@ -39,7 +38,7 @@ class SegmentationDataGenerator(keras.utils.Sequence):
             self.data_path = test_path
 
         if self.use_balanced_dataset:
-            self.df_classes = self.split_class_from_dataframe()
+            self.df_classes = self.split_class_from_dataframe(use_defective_only)
 
         self.on_epoch_end()
 
@@ -66,8 +65,8 @@ class SegmentationDataGenerator(keras.utils.Sequence):
 
     def __getitem__(self, index): 
         X = np.empty((self.batch_size,self.img_h,self.img_w,3),dtype=np.float32)
-        y = np.empty((self.batch_size,self.img_h,self.img_w,4),dtype=np.int8)
-        mask = np.empty((256,1600,4),dtype=np.int8)
+        y = np.empty((self.batch_size,self.img_h,self.img_w,5),dtype=np.int8)
+        mask = np.empty((256,1600,5),dtype=np.int8)
         
         if (self.use_balanced_dataset):
             df_batch = self.get_class_balanced_batch(self.batch_size)
@@ -79,9 +78,10 @@ class SegmentationDataGenerator(keras.utils.Sequence):
             df = df_batch[i]
             img = np.asarray(Image.open(self.data_path + df['ImageId']))
             for j in range(4):
-                mask[:,:,j] = util.rle2maskResize(df['e'+str(j+1)])               
+                mask[:,:,j] = util.rle2maskResize(df['e'+str(j+1)])  
+            mask[:,:,4] = util.mask2Background(mask)     
 
-            random_crop_indexes = util.get_random_crop_indexes((256,1600), (self.img_h,self.img_w), img, mask)
+            random_crop_indexes = util.get_random_crop_indexes((256,1600), (self.img_h,self.img_w), img, mask[:,:,:4])
             X[i,], y[i,:,:,:] = util.random_crop(img, mask, random_crop_indexes)
      
         #Data augmentation
@@ -99,18 +99,21 @@ class SegmentationDataGenerator(keras.utils.Sequence):
 
 
 
-    def split_class_from_dataframe(self):
-        df_0 = self.df[self.df['count'] == 0]
+    def split_class_from_dataframe(self, use_defective_only):
         df_1 = self.df[self.df.e1.astype(bool)]
         df_2 = self.df[self.df.e2.astype(bool)]
         df_3 = self.df[self.df.e3.astype(bool)]
         df_4 = self.df[self.df.e4.astype(bool)]
 
-        return df_0, df_1, df_2, df_3, df_4 
+        if (not use_defective_only):
+            df_0 = self.df[self.df['count'] == 0]
+            return df_0, df_1, df_2, df_3, df_4 
+        
+        return df_1, df_2, df_3, df_4 
 
 
     def get_class_balanced_batch(self, batch_size):
-        assert (batch_size % len(self.df_classes) == 0), "Batch size should be divisible by 5 for the moment"
+        assert (batch_size % len(self.df_classes) == 0), "Batch size should be divisible by the number of classes for the moment"
 
         df_batch = list()
         n_img_per_class = int(batch_size/len(self.df_classes))

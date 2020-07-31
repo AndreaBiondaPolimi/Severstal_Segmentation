@@ -134,6 +134,13 @@ def rle2maskResize(rle):
 
     return mask.reshape( (height,width), order='F' )
 
+def mask2Background (mask):
+    background = np.zeros((256,1600),dtype=np.int8)
+    for j in range(4):
+        background = np.logical_or(background, mask[:,:,j])
+    background = np.logical_not(background)
+
+    return background
 
 #Mask visualization
 def mask2contour(mask, width=3):
@@ -241,7 +248,7 @@ def get_random_crop_indexes(original_image_size, random_crop_size, img, mask):
 
     #Try to get the random crop that contains some of the defect, if present
     if (mask is not None) and (np.count_nonzero(mask) > 0):
-        for _ in range (10): #Try n times to get the random crop before give up
+        for _ in range (30): #Try n times to get the random crop before give up
             x = np.random.randint(0, width - dx + 1)
             y = np.random.randint(0, height - dy + 1)
             if (not is_total_black(mask, x, y, dx, dy, 0, 40)):
@@ -249,7 +256,7 @@ def get_random_crop_indexes(original_image_size, random_crop_size, img, mask):
         
 
     #Try to get the random crop that does not show full black image, if defect not present
-    for _ in range (5): #Try n times to get the random crop before rx/lx choice
+    for _ in range (20): #Try n times to get the random crop before rx/lx choice
         x = np.random.randint(0, width - dx + 1)
         y = np.random.randint(0, height - dy + 1)
         if (not is_total_black(img, x, y, dx, dy)):

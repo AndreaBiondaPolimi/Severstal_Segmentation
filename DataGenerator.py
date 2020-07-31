@@ -21,10 +21,12 @@ def load_dataset_segmentation (preprocess_type, use_defective_only = False):
     train_idxs, valid_idxs = util.get_random_split(train2)
 
     preprocess = sm.get_preprocessing(preprocess_type)
+    #preprocess = None
     shapes = ((4,256,256),(4,256,384))
 
-    train_batches =  SegmentationDataGenerator(train2.iloc[train_idxs], shapes=shapes, shuffle=True, use_balanced_dataset=False,
-                                                preprocess=preprocess, augmentation_parameters=augmentation_parameters)
+    train_batches =  SegmentationDataGenerator(train2.iloc[train_idxs], shapes=shapes, shuffle=True, use_balanced_dataset=True,
+                                                preprocess=preprocess, augmentation_parameters=augmentation_parameters, 
+                                                use_defective_only=use_defective_only)
 
     valid_batches = SegmentationDataGenerator(train2.iloc[valid_idxs], shuffle=True, preprocess=preprocess)
     
@@ -36,7 +38,9 @@ def load_dataset_segmentation (preprocess_type, use_defective_only = False):
         for i in range(len(images)):
             image = images[i].astype(np.int16)
             mask = masks[i]
-            util.show_img_and_def((image, mask) , ('orig','mask'))
+            #util.show_img_and_def((image, mask) , ('orig','mask'))
+            util.show_imgs((image, mask[:,:,0], mask[:,:,1], mask[:,:,2], mask[:,:,3], mask[:,:,4]),
+                            ('img', '0', '1', '2', '3', '4'), ('','','','','',''))
     """
     
     return train_batches, valid_batches 
@@ -100,18 +104,19 @@ def test_model(seg_model, cla_model, seg_preprocess_type, cls_preprocess_type):
             seg_x = seg_preprocess(image)          
             cls_x = cls_preprocess(image)          
                
+            
             #Predict if the current image is defective or not
             cls_res = cla_model.predict(np.reshape(cls_x,(1,256,1600,3)))
 
             #If it is most probable defective, the result is a whole zero mask
-            
             if (cls_res < 0.5):
-                res = np.zeros((256,1600,4),dtype=np.uint8)
+                res = np.zeros((256,1600,5),dtype=np.uint8)
+                res[:,:,4] = 1
 
             #Otherwise apply segmentation 
             else:
                 res = seg_model.predict(np.reshape(seg_x,(1,256,1600,3)))
-                res = np.reshape(res,(256,1600,4))
+                res = np.reshape(res,(256,1600,5))
 
             res[np.where(res < 0.5)] = 0
             res[np.where(res >= 0.5)] = 1
@@ -155,8 +160,8 @@ def fulltest_classification_model (cls_model, cls_preprocess_type):
 
 from keras import backend as K
 def dice_coef(y_true, y_pred, smooth=1):
-    y_true_f = y_true.flatten()
-    y_pred_f = y_pred.flatten()
+    y_true_f = y_true[:,:,:4].flatten()
+    y_pred_f = y_pred[:,:,:4].flatten()
     intersection = np.sum(y_true_f * y_pred_f)
     ret = (2 * intersection + smooth) / (np.sum(y_true_f) + np.sum(y_pred_f) + smooth)
     return ret

@@ -6,6 +6,7 @@ import keras
 
 from keras import backend as K
 from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
+from keras.losses import categorical_crossentropy
 
 def get_segmentation_model (input_size = (None, None, 3), pretrained_weights=None, preprocess_type = 'none'):
     if (preprocess_type == 'resnet34'):
@@ -39,11 +40,13 @@ def resent34_seg_model (input_size, pretrained_weights):
 
 
 def efficientnetb3_seg_model (input_size, pretrained_weights):
-    model = FPN('efficientnetb3', encoder_weights='imagenet', input_shape=input_size, classes=4, activation='sigmoid')
+    model = FPN('efficientnetb3', encoder_weights='imagenet', input_shape=input_size, classes=5, activation='softmax')
 
-    adam = keras.optimizers.Adam(lr=1e-4)
+    adam = keras.optimizers.Adam(lr=1e-5)
+    
     model.compile(optimizer = adam, loss = bce_dice_loss , metrics=[dice_coef])
-    #model.compile(optimizer = adam, loss = lovasz_loss , metrics=[dice_coef])
+    #model.compile(optimizer = adam, loss = bce_jaccard_loss , metrics=[dice_coef])
+    #model.compile(optimizer = adam, loss = categorical_crossentropy , metrics=[dice_coef])
 
     model.summary()
 
@@ -82,9 +85,9 @@ def train (model, train_dataset, valid_dataset, epochs):
 
 
 
-def dice_coef(y_true, y_pred, smooth=1):
-    y_true_f = K.flatten(y_true)
-    y_pred_f = K.flatten(y_pred)
+def dice_coef(y_true, y_pred, smooth=1):  
+    y_true_f = K.flatten(y_true[:,:,:,:4])
+    y_pred_f = K.flatten(y_pred[:,:,:,:4])
     intersection = K.sum(y_true_f * y_pred_f)
     return (2. * intersection + smooth) / (K.sum(y_true_f) + K.sum(y_pred_f) + smooth)
 
