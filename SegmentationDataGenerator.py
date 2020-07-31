@@ -17,7 +17,9 @@ test_path = 'Severstal_Dataset\\test_images\\'
 
 class SegmentationDataGenerator(keras.utils.Sequence):
     def __init__(self, df, shapes=((1,256,1600),), subset="train", shuffle=False, use_balanced_dataset=False,
-                 preprocess=None, info={}, augmentation_parameters = None, use_defective_only=False):
+                 preprocess=None, info={}, augmentation_parameters = None, use_defective_only=False,
+                 activation='sigmoid'):
+        
         super().__init__()
         self.df = df
     
@@ -36,6 +38,11 @@ class SegmentationDataGenerator(keras.utils.Sequence):
             self.data_path = train_path
         elif self.subset == "test":
             self.data_path = test_path
+
+        if activation == 'sigmoid':
+            self.channels_mask = 4
+        else:
+            self.channels_mask = 5
 
         if self.use_balanced_dataset:
             self.df_classes = self.split_class_from_dataframe(use_defective_only)
@@ -65,8 +72,8 @@ class SegmentationDataGenerator(keras.utils.Sequence):
 
     def __getitem__(self, index): 
         X = np.empty((self.batch_size,self.img_h,self.img_w,3),dtype=np.float32)
-        y = np.empty((self.batch_size,self.img_h,self.img_w,5),dtype=np.int8)
-        mask = np.empty((256,1600,5),dtype=np.int8)
+        y = np.empty((self.batch_size,self.img_h,self.img_w,self.channels_mask),dtype=np.int8)
+        mask = np.empty((256,1600,self.channels_mask),dtype=np.int8)
         
         if (self.use_balanced_dataset):
             df_batch = self.get_class_balanced_batch(self.batch_size)
@@ -78,8 +85,9 @@ class SegmentationDataGenerator(keras.utils.Sequence):
             df = df_batch[i]
             img = np.asarray(Image.open(self.data_path + df['ImageId']))
             for j in range(4):
-                mask[:,:,j] = util.rle2maskResize(df['e'+str(j+1)])  
-            mask[:,:,4] = util.mask2Background(mask)     
+                mask[:,:,j] = util.rle2maskResize(df['e'+str(j+1)]) 
+            if (self.channels_mask > 4): 
+                mask[:,:,4] = util.mask2Background(mask)     
 
             random_crop_indexes = util.get_random_crop_indexes((256,1600), (self.img_h,self.img_w), img, mask[:,:,:4])
             X[i,], y[i,:,:,:] = util.random_crop(img, mask, random_crop_indexes)
@@ -133,32 +141,3 @@ class SegmentationDataGenerator(keras.utils.Sequence):
             df_batch.append(self.df.iloc[index])
 
         return df_batch
-    
-
-
-
-
-
-
-
-
-
-
-
-
-    
-
-"""
-#Collect and crop images of the current batch
-for i,f in enumerate(self.df['ImageId'].iloc[indexes]):
-    self.info[index*self.batch_size+i]=f
-    img = np.asarray(Image.open(self.data_path + f))
-    #Generate random crop indexes
-    random_crop_indexes = util.get_random_crop_indexes((256,1600),(self.img_h,self.img_w), img)
-
-    for j in range(4):
-        #Generate mask
-        mask = util.rle2maskResize(self.df['e'+str(j+1)].iloc[indexes[i]])  
-        #Random Crop              
-        X[i,], y[i,:,:,j] = util.random_crop(img, mask, random_crop_indexes)
-"""

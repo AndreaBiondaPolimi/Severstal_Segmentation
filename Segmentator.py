@@ -8,19 +8,21 @@ from keras import backend as K
 from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
 from keras.losses import categorical_crossentropy
 
-def get_segmentation_model (input_size = (None, None, 3), pretrained_weights=None, preprocess_type = 'none'):
+def get_segmentation_model (input_size = (None, None, 3), pretrained_weights=None, preprocess_type = 'none', activation='sigmoid'):
     if (preprocess_type == 'resnet34'):
-        return resent34_seg_model(input_size, pretrained_weights)
+        return resent34_seg_model(input_size, pretrained_weights, activation)
     elif (preprocess_type == 'efficientnetb3'):
-        return efficientnetb3_seg_model(input_size, pretrained_weights)
+        return efficientnetb3_seg_model(input_size, pretrained_weights, activation)
         
 
 from segmentation_models import Unet
 from segmentation_models import FPN
 from segmentation_models.losses import bce_jaccard_loss
 import runai.ga
-def resent34_seg_model (input_size, pretrained_weights):
-    model = Unet('resnet34', encoder_weights='imagenet', input_shape=input_size, classes=4, activation='sigmoid')
+def resent34_seg_model (input_size, pretrained_weights, activation):
+    classes = 4 if activation == 'sigmoid' else 5
+    
+    model = Unet('resnet34', encoder_weights='imagenet', input_shape=input_size, classes=classes, activation=activation)
     
     #loss = 'binary_crossentropy'
     loss = bce_dice_loss
@@ -39,8 +41,10 @@ def resent34_seg_model (input_size, pretrained_weights):
     return model
 
 
-def efficientnetb3_seg_model (input_size, pretrained_weights):
-    model = FPN('efficientnetb3', encoder_weights='imagenet', input_shape=input_size, classes=5, activation='softmax')
+def efficientnetb3_seg_model (input_size, pretrained_weights, activation):
+    classes = 4 if activation == 'sigmoid' else 5
+    
+    model = FPN('efficientnetb3', encoder_weights='imagenet', input_shape=input_size, classes=classes, activation=activation)
 
     adam = keras.optimizers.Adam(lr=1e-5)
     

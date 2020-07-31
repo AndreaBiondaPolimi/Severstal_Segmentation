@@ -13,22 +13,31 @@ import timeit
 augmentation_parameters = {'flip_prob':0.5, 'shift_limit':0.1, 'rotate_limit':20, 'shift_rot_prob':0.5, 
                            'contrast_limit':0.2, 'brightness_limit':0.2, 'contr_bright_prob':0.5}
 
+
 import segmentation_models as sm
-def load_dataset_segmentation (preprocess_type, use_defective_only = False):
+def load_dataset_segmentation (preprocess_type, use_defective_only = False, activation='sigmoid'):
+    np.random.seed(15)
+
     train2 = util.restructure_data_frame('Severstal_Dataset\\train.csv')
     if (use_defective_only):
         train2 = util.get_defective_data_frame(train2)
     train_idxs, valid_idxs = util.get_random_split(train2)
 
-    preprocess = sm.get_preprocessing(preprocess_type)
-    #preprocess = None
-    shapes = ((4,256,256),(4,256,384))
+    #preprocess = sm.get_preprocessing(preprocess_type)
+    preprocess = None
 
-    train_batches =  SegmentationDataGenerator(train2.iloc[train_idxs], shapes=shapes, shuffle=True, use_balanced_dataset=True,
-                                                preprocess=preprocess, augmentation_parameters=augmentation_parameters, 
-                                                use_defective_only=use_defective_only)
+    if (use_defective_only):
+        shapes = ((4,256,256),(4,256,384))
+    else:
+        shapes = ((5,256,384),(5,256,256))
 
-    valid_batches = SegmentationDataGenerator(train2.iloc[valid_idxs], shuffle=True, preprocess=preprocess)
+    train_batches =  SegmentationDataGenerator(train2.iloc[train_idxs], shapes=shapes, 
+                            shuffle=True, use_balanced_dataset=True, preprocess=preprocess, 
+                            augmentation_parameters=augmentation_parameters, 
+                            use_defective_only=use_defective_only, activation=activation)
+
+    valid_batches = SegmentationDataGenerator(train2.iloc[valid_idxs], 
+                                                shuffle=True, preprocess=preprocess)
     
     """
     iterator = iter(train_batches)
@@ -39,8 +48,12 @@ def load_dataset_segmentation (preprocess_type, use_defective_only = False):
             image = images[i].astype(np.int16)
             mask = masks[i]
             #util.show_img_and_def((image, mask) , ('orig','mask'))
+            
             util.show_imgs((image, mask[:,:,0], mask[:,:,1], mask[:,:,2], mask[:,:,3], mask[:,:,4]),
                             ('img', '0', '1', '2', '3', '4'), ('','','','','',''))
+
+            #util.show_imgs((image, mask[:,:,0], mask[:,:,1], mask[:,:,2], mask[:,:,3]),
+                            #('img', '0', '1', '2', '3'), ('','','','',''))
     """
     
     return train_batches, valid_batches 

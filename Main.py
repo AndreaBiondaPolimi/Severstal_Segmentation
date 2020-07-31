@@ -8,11 +8,17 @@ import Classificator as cla
 #preprocess_type='resnet50'
 preprocess_type='efficientnetb3'
 
+activation = 'sigmoid'
+#activation = 'softmax'
+
+use_defective_only = True
+#use_defective_only = False
+
 def segment ():
-    train, valid = dg.load_dataset_segmentation(preprocess_type, True)
+    train, valid = dg.load_dataset_segmentation(preprocess_type, use_defective_only, activation)
     
     model = seg.get_segmentation_model(preprocess_type=preprocess_type,
-                pretrained_weights='check_val_dice56_0.70_3x10-6.h5')
+                pretrained_weights=None, activation=activation)
 
     seg.train(model, train, valid, 100)
 

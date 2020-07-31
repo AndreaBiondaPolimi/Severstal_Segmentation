@@ -1,6 +1,6 @@
 1)Data Augmentation (hflip,vflip,brighth,zoom,shift) (V)
 	1.1)Implement complete data augmentation -> proviamo albumentations (V)
-	1.2)Proprocessing ??? per ResnetXXX no problem, per gli altri va implmentato l'undo-rescale nella visualizzazione
+	1.2)Proprocessing ??? per ResnetXXX no problem, per gli altri va implmentato l'undo-rescale nella visualizzazione (V)
 
 2)implement train on crop and valid on full (V)
 	2.1)epoch with different crop size (V)
@@ -11,8 +11,8 @@
 	2.4)Avoid black crops (V)
 
 3)Use lr scheduler (V)
-4)Different loss (dice+bce / lovasz)
-5)Implement softmax
+4)Different loss (dice+bce / lovasz / jaccard / tversky)
+5)Implement softmax (V)
 6)Accumulate gradients in batch
 
 
@@ -20,14 +20,12 @@
 When reached a decent level of segmentation-dice (0.7)
 
 
-5)Pre classification stage to remove false positive (defect vs non-defect imgs)
+5)Pre classification stage to remove false positive (defect vs non-defect imgs) (V)
 	5.1)implement data generator as segmentation (V)
 	5.2)if random crop, implement 0/1 generation accordingly
 	5.3)implement collaborative prediction (V)
-	5.4)Check accuracy matrix
+	5.4)Check accuracy matrix (V)
 
-6)New Models (EfficientNet/FPN)
-7)Multi models ensamble
-8)Train on kaggle
-9)Wipe out blobs not bigger than a treshold
-
+6)New Models (EfficientNet/FPN/ResUnet)
+7)Wipe out blobs not bigger than a treshold
+8)Use bigger and rectangular images
