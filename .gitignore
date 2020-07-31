@@ -1,5 +1,8 @@
 # ignore all weights_saved
 *.h5
 
+#ignore all csv files
+*.csv
+
 #ignore ide folders
 .vscode/
