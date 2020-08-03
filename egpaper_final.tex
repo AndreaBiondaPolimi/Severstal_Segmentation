@@ -45,43 +45,55 @@ Politecnico di Milano\\
    The abstract should be self contained and explain what the paper is about. Usually abstracts are no longer than 300 words. You should state what are the main contributions of your work and tempt the reader to continue to read your paper. A good abstract briefly describes your problem, approach, and key results. This document is based on the CVPR submission template, and it has been adapted to submit a technical report of a project of the Deep Learning and Image Classification course.}
 \end{abstract}
 
-%%%%%%%%% BODY TEXT
+%%%%%%%%% INTRODUCTION
 %------------------------------------------------------------------------
 \section{Introduction}
-   The proposed solution takes in input images of steel sheet that come from high-frequency cameras and output the same-size segmented images, which contain the area of the defect(s) identified (if any) and the corresponding type. The types of defects can be classified in pitting (1), inclusion(2), scratches(3) and corrosion(4). \\
+   The main contribution of this paper is to present a method to solve the above problem, that provides a good tradeoff between accuracy on defect segmentation and precision in defective-image identification. \\
+   The proposed solution takes in input images of steel sheet that come from high-frequency cameras and output the same-size segmented images, which contain the area of the defect(s) identified (if any) and the corresponding type. \\
+   The first explored approach is to use a single Fully Convolutional Neural Network that performs semantic segmentation over the four defects; in particular I have used U-Net architecture. This approach gives a Dice coefficient of 0.48 in the test set.
+   In order to improve the precision, and so reducing false positives, the second and final approach is a pipeline of two different techniques: in the first stage is present a Binary Classifier that is trained to filters out defect-free images; in the second stage, it is placed the segmentation model presented in the first approach, that will segment only images that are labelled defective by the Classifier. This second approach gives a Dice coefficient of 0.71 in the test set. 
 
-   HERE THE IMAGES\\
 
-   Briefly explain the two approaches (segmentation , classification+segmentation) and results
+   \textcolor{blue}{
+   This is the first section of your paper and you should contextualize the problem you are working on, why it is important, and give an overview of your results. It is useful to list all the contributions of your work very clearly, so that the reviewer can easily understand the value of your paper. This is helpful to guide the reader through the paper. If your project consists in replicating and/or extending another paper, then you should be very clear about it explaining what you did and how you proceeded.
+   For instance, the main contribution of this paper are: 
+   \begin{itemize}
+      \item A brief tutorial on how to write a paper/technical report.
+      \item Specific good/bad examples of writing.
+      \item An example of structure that is suggested to follow for a technical report and can be reorganized as you need.
+   \end{itemize}
+   Each researcher has its own style and preferences when it comes to write a paper, so feel free to modify the structure as it pleases you. 
+   This tutorial is especially directed to master students who might need more help to organize their reports.\\
+   dopo:The types of defects can be classified in pitting (1), inclusion(2), scratches(3) and corrosion(4). HERE THE IMAGES}
+
+   \textcolor{blue}{
+   \subsection{Language}
+      All manuscripts must be in English. Do not use contraction forms, \eg \emph{doesn't} $\xrightarrow{}$ \emph{does not}, \emph{isn't} $\xrightarrow{}$ \emph{is not}. }
+
+   \textcolor{blue}{
+   \subsection{Paper length}
+      Papers, excluding the references section, must be between \textbf{4-6} pages, bust must be no longer than \textbf{six pages}. The maximum number of pages is strict. Overlength papers will simply not be graded or graded negatively. Note that this \LaTeX\ guide already sets figure captions and references in a smaller font.
+      The references section will not be included in the page count, and there is no limit on the length of the references section. For example, a paper of six pages with two pages of references would have a total length of 8 pages, so it is fine.}
 
 
+
+%%%%%%%%% RELATED WORK
+%------------------------------------------------------------------------
+\section{Related work}
+pensavo di mettere semantic segmentation, unet, (resnet), image classification
 
 \textcolor{blue}{
-This is the first section of your paper and you should contextualize the problem you are working on, why it is important, and give an overview of your results. It is useful to list all the contributions of your work very clearly, so that the reviewer can easily understand the value of your paper. This is helpful to guide the reader through the paper. If your project consists in replicating and/or extending another paper, then you should be very clear about it explaining what you did and how you proceeded.
-For instance, the main contribution of this paper are: 
-\begin{itemize}
-    \item A brief tutorial on how to write a paper/technical report.
-    \item Specific good/bad examples of writing.
-    \item An example of structure that is suggested to follow for a technical report and can be reorganized as you need.
-\end{itemize}
-Each researcher has its own style and preferences when it comes to write a paper, so feel free to modify the structure as it pleases you. 
-This tutorial is especially directed to master students who might need more help to organize their reports.
+In this section you should discuss published work that relates to your project. This is expected to be full of references, meaning that you have read the existing literature and you know what you are working on very well. This is not just a list or works, but you are not supposed to cluster papers that use similar approaches and compare them each other using very short sentences. I strongly suggest to check \cite{steinhardt, lipton} blog posts for some good practices in writing a paper. A quote that I like very much is \emph{``Research is spending 6 hours reading 35 papers, so you can write one sentence containing 2 references''} \cite{twit:ref}. Keep it in mind while you are writing!
 }
 
 
-\subsection{Language}
 
-All manuscripts must be in English. Do not use contraction forms, \eg \emph{doesn't} $\xrightarrow{}$ \emph{does not}, \emph{isn't} $\xrightarrow{}$ \emph{is not}. 
-
-\subsection{Paper length}
-Papers, excluding the references section, must be between \textbf{4-6} pages, bust must be no longer than \textbf{six pages}. The maximum number of pages is strict. Overlength papers will simply not be graded or graded negatively. Note that this \LaTeX\ guide already sets figure captions and references in a smaller font.
-
-The references section will not be included in the page count, and there is no limit on the length of the references section. For example, a paper of six pages with two pages of references would have a total length of 8 pages, so it is fine.
-
-
+%%%%%%%%% RELATED WORK
 %------------------------------------------------------------------------
-\section{Related work}
-In this section you should discuss published work that relates to your project. This is expected to be full of references, meaning that you have read the existing literature and you know what you are working on very well. This is not just a list or works, but you are not supposed to cluster papers that use similar approaches and compare them each other using very short sentences. I strongly suggest to check \cite{steinhardt, lipton} blog posts for some good practices in writing a paper. A quote that I like very much is \emph{``Research is spending 6 hours reading 35 papers, so you can write one sentence containing 2 references''} \cite{twit:ref}. Keep it in mind while you are writing!
+\section{Dataset analysis}
+AAA
+
+
 %------------------------------------------------------------------------
 \section{Proposed approach}
 This is the core of your paper, where you describe the details of the proposed method for solving the problem that you set up in the introduction. This is the most important section. It has to be clear why the chosen approach is the right thing to do with respect to the possible alternatives. The explanation of the method has to be readable and understandable and it should not raise obvious questions from the reader. 
