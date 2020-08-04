@@ -63,8 +63,7 @@ Politecnico di Milano\\
       \item An example of structure that is suggested to follow for a technical report and can be reorganized as you need.
    \end{itemize}
    Each researcher has its own style and preferences when it comes to write a paper, so feel free to modify the structure as it pleases you. 
-   This tutorial is especially directed to master students who might need more help to organize their reports.\\
-   dopo:The types of defects can be classified in pitting (1), inclusion(2), scratches(3) and corrosion(4). HERE THE IMAGES}
+   This tutorial is especially directed to master students who might need more help to organize their reports.}
 
    \textcolor{blue}{
    \subsection{Language}
@@ -80,7 +79,14 @@ Politecnico di Milano\\
 %%%%%%%%% RELATED WORK
 %------------------------------------------------------------------------
 \section{Related work}
-pensavo di mettere semantic segmentation, unet, (resnet), image classification
+   \subsection{Semantic Segmentation}
+      spiegone
+   \subsection{U-Net}
+      spiegone
+   \subsection{FPN (se non ho alternative)} 
+      spiegone
+   \subsection{Image classification (boh)}
+      spiegone
 
 \textcolor{blue}{
 In this section you should discuss published work that relates to your project. This is expected to be full of references, meaning that you have read the existing literature and you know what you are working on very well. This is not just a list or works, but you are not supposed to cluster papers that use similar approaches and compare them each other using very short sentences. I strongly suggest to check \cite{steinhardt, lipton} blog posts for some good practices in writing a paper. A quote that I like very much is \emph{``Research is spending 6 hours reading 35 papers, so you can write one sentence containing 2 references''} \cite{twit:ref}. Keep it in mind while you are writing!
@@ -90,8 +96,36 @@ In this section you should discuss published work that relates to your project. 
 
 %%%%%%%%% RELATED WORK
 %------------------------------------------------------------------------
+\graphicspath{ {./Resources/} }
 \section{Dataset analysis}
-AAA
+   The first, and one of the most important phase of every Machine Learning task, is the analysis of input data. In this problem we have 12568 greyscale images of size 1600x256x3 that comes from real camera shot of steel sheets and a data file (.csv) that contains all the information in order to generate each defective mask; this dataset is obtained from \cite{Severstal}.The types of defects can be classified in Pitting (Figure \ref{fig:defect1}), Inclusion (Figure \ref{fig:defect2}), Scratches (Figure \ref{fig:defect3}) and Corrosion (Figure \ref{fig:defect4}).
+
+   \begin{figure}[t]
+      \centering
+      \caption{Pitting} \label{fig:defect1}
+      \includegraphics[scale=0.25]{Img_Defect1}
+      \caption{Inclusion} \label{fig:defect2}
+      \includegraphics[scale=0.25]{Img_Defect2}
+      \caption{Scratches} \label{fig:defect3}
+      \includegraphics[scale=0.25]{Img_Defect3}
+      \caption{Corrosion} \label{fig:defect4}
+      \includegraphics[scale=0.25]{Img_Defect4}
+   \end{figure}
+
+   The dataset exhibit a fairly even distribution between defective (53\%) and non-defective images (47\%), but among defective ones we can notica a strong imbalance between defect classes (Figure \ref{fig:classImbalance}). This distribution can lead to recognize only one type of defect (the third one), or worst recognize very few blobs as defective due to the limited number of pixel marked as defective among all the images.
+   The proposed approach is thought also to deal with this problem.
+
+   \begin{figure}[h]
+      \centering
+      \caption{Defect class distribution} \label{fig:classImbalance}
+      \includegraphics[scale=0.5]{Img_ClassImbalance}
+   \end{figure}
+
+
+
+
+
+
 
 
 %------------------------------------------------------------------------
