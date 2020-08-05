@@ -103,26 +103,22 @@ In this section you should discuss published work that relates to your project. 
    \begin{figure}[t]
       \centering
       \caption{Pitting} \label{fig:defect1}
-      \includegraphics[scale=0.25]{Img_Defect1}
+      \includegraphics[scale=0.3]{Img_Defect1}
       \caption{Inclusion} \label{fig:defect2}
-      \includegraphics[scale=0.25]{Img_Defect2}
+      \includegraphics[scale=0.3]{Img_Defect2}
       \caption{Scratches} \label{fig:defect3}
-      \includegraphics[scale=0.25]{Img_Defect3}
+      \includegraphics[scale=0.3]{Img_Defect3}
       \caption{Corrosion} \label{fig:defect4}
-      \includegraphics[scale=0.25]{Img_Defect4}
+      \includegraphics[scale=0.3]{Img_Defect4}
    \end{figure}
 
-   The dataset exhibit a fairly even distribution between defective (53\%) and non-defective images (47\%), but among defective ones we can notica a strong imbalance between defect classes (Figure \ref{fig:classImbalance}). This distribution can lead to recognize only one type of defect (the third one), or worst recognize very few blobs as defective due to the limited number of pixel marked as defective among all the images.
-   The proposed approach is thought also to deal with this problem.
+   The dataset exhibit a fairly even distribution between defective (56\%) and non-defective images (44\%), but among defective ones we can notica a strong imbalance between defect classes (Figure \ref{fig:classImbalance}). This distribution can lead to recognize only one type of defect (the third one), since it represents the largest part of the defective images. During the discussion of the proposed approach I will explain a solution to this problem.
 
    \begin{figure}[h]
       \centering
       \caption{Defect class distribution} \label{fig:classImbalance}
-      \includegraphics[scale=0.5]{Img_ClassImbalance}
+      \includegraphics[scale=0.45]{Img_ClassImbalance}
    \end{figure}
-
-
-
 
 
 
@@ -130,10 +126,30 @@ In this section you should discuss published work that relates to your project. 
 
 %------------------------------------------------------------------------
 \section{Proposed approach}
-This is the core of your paper, where you describe the details of the proposed method for solving the problem that you set up in the introduction. This is the most important section. It has to be clear why the chosen approach is the right thing to do with respect to the possible alternatives. The explanation of the method has to be readable and understandable and it should not raise obvious questions from the reader. 
+   The first and straightforward solution that I have applied to the problem is build a U-Net architecture for semantic segmentation in such a way that outputs same-size images with 4 channels, one for each defect class (Figure \ref{fig:firstApproach}). 
+   Each channel(layer) of the output represents the heatmap (image where for each pixel is assigned a probability that it belongs to a defect in the original image) of the corresponding defect class. 
 
+   \begin{figure}[h]
+      \centering
+      \caption{First approach: segmentation inference only} \label{fig:firstApproach}
+      \includegraphics[scale=0.55]{Img_FirstApproach}
+   \end{figure}
+
+   This method has a very good capibility in defect recognition, but at the same time it hardly distinguishes real defects from false defects due to their similar pattern \textcolor{red}{(an example on figure xxx )}. This problem is higly penalized in the case in which no defects is present with Dice metric \textcolor{red}{(link to the formulae)}, that could be reasonable in high capacity foundries where the goal is also reduce at minimum the false scrap and so wasting resources (if the machine labels part of the steel sheet as defective it will be throwed away).\\
+   For this reason the second, and real proposed approach, is to train a Binary classifier with the goal of distinguish defective from non-defective images. The idea is to use the classifier to decide, during inference time, weather an image could contain a defect or not and if the answer is true pass it to the U-Net to segment the defect, otherwise the segmentation phase is skipped and whole-zero masks are generated as heatmaps (Figure \ref{fig:secondApproach}).\\
+   This pipeline will reduce the false scrap and increase Dice coefficient as you can see in the result section \textcolor{red}{(result section)}.
+    
+   \begin{figure}[h]
+      \caption{Proposed approach: pipelined inference } \label{fig:secondApproach}
+      \includegraphics[scale=0.48]{Img_SecondApproach}
+   \end{figure}
+
+
+
+
+\textcolor{blue}{
+This is the core of your paper, where you describe the details of the proposed method for solving the problem that you set up in the introduction. This is the most important section. It has to be clear why the chosen approach is the right thing to do with respect to the possible alternatives. The explanation of the method has to be readable and understandable and it should not raise obvious questions from the reader. 
 You can divide the section in paragraphs or subsections that can be useful for the presentation of your method. Usually at this point you may want to place equations, figures and tables to clarify what you are explaining.
-%-------------------------------------------------------------------------
 \subsection{Mathematics}
 Please number all of your sections and displayed equations.  It is
 important for readers to be able to refer to any particular equation.  Just
@@ -141,7 +157,6 @@ because you didn't refer to it in the text does not mean some future reader
 might not need to refer to it.  It is cumbersome to have to use
 circumlocutions like ``the equation second from the top of page 3 column
 1''. 
-%-------------------------------------------------------------------------
 \subsection{Footnotes}
 Please use footnotes\footnote {This is what a footnote looks like.  It
 often distracts the reader from the main flow of the argument.} sparingly.
@@ -150,14 +165,12 @@ observations in
 the text (within parentheses, if you prefer, as in this sentence).  If you
 wish to use a footnote, place it at the bottom of the column on the page on
 which it is referenced. Use Times 8-point type, single-spaced.
-%-------------------------------------------------------------------------
 \subsection{References}
 List and number all bibliographical references in 9-point Times,
 single-spaced, at the end of your paper. When referenced in the text,
 enclose the citation number in square brackets, for
 example~\cite{Authors14}.  Where appropriate, include the name(s) of
 editors of referenced books.
-%-------------------------------------------------------------------------
 \subsection{Illustrations, graphs, and photographs}
 All graphics should be centered.  Please ensure that any point you wish to
 make is resolvable in a printed copy of the paper.  Resize fonts in figures
@@ -165,17 +178,10 @@ to match the font in the body text, and choose line widths which render
 effectively in print.  Many readers (and reviewers), even of an electronic
 copy, will choose to print your paper in order to read it.  You cannot
 insist that they do otherwise, and therefore must not assume that they can
-zoom in to see tiny details on a graphic.
+zoom in to see tiny details on a graphic.}
 
-When placing figures in \LaTeX, it's almost always best to use
-\verb+\includegraphics+, and to specify the  figure width as a multiple of
-the line width as in the example below
-{\small\begin{verbatim}
-   \usepackage[dvips]{graphicx} ...
-   \includegraphics[width=0.8\linewidth]
-                   {myfile.eps}
-\end{verbatim}
-}
+
+
 
 %------------------------------------------------------------------------
 \section{Experiments}
