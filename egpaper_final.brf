@@ -1,4 +1,8 @@
-\backcite {steinhardt, lipton}{{2}{2.4}{subsection.2.4}}
-\backcite {twit:ref}{{2}{2.4}{subsection.2.4}}
+\backcite {Unet}{{2}{2.1}{subsection.2.1}}
+\backcite {resnet}{{2}{2.2}{subsection.2.2}}
+\backcite {efficientnet}{{2}{2.3}{subsection.2.3}}
+\backcite {steinhardt, lipton}{{2}{2.3}{subsection.2.3}}
+\backcite {twit:ref}{{2}{2.3}{subsection.2.3}}
 \backcite {Severstal}{{2}{3}{section.3}}
-\backcite {Authors14}{{3}{4.3}{subsection.4.3}}
+\backcite {efficientnet}{{3}{4.1}{subsection.4.1}}
+\backcite {Authors14}{{4}{4.5}{subsection.4.5}}

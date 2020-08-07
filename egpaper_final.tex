@@ -79,14 +79,14 @@ Politecnico di Milano\\
 %%%%%%%%% RELATED WORK
 %------------------------------------------------------------------------
 \section{Related work}
-   \subsection{Semantic Segmentation}
-      spiegone
+   Since the output of the problem is a pixel-wise label for the input image, it’s essentially a semantic segmentation task. In our case it is also used a binary classifier to refine the results.
    \subsection{U-Net}
-      spiegone
-   \subsection{FPN (se non ho alternative)} 
-      spiegone
-   \subsection{Image classification (boh)}
-      spiegone
+      The baseline architecture used in the segmentation phase is the so called U-Net that is composed of two concatenated parts: the contracting path (or down-sampling network or encoder network) works as classical Convolutional Neural Network (CNN) to extract meaningful feature from the image, while the expansive path (or up-sampling network or decoder network) builds an high resolution output starting from the feature extracted during the first phase. The bigger contribution taken by this architecture is that each up-sampling layer is enriched with features information extracted in the corresponding downsampling layer network in order to achieve higher semantic levels \cite{Unet}. 
+   \subsection{Residual Networks} 
+      This family of Convolutional Neural Network is build to face the degradation problem of very deep networks. The related paper proposes that such degradation is not caused by overfitting, but instead due to the well-known vanishing gradient problem. The main idea is to add an identity shortcut connection between blocks (group of convolutional layers), in such a way that each one learn features from both previous block and input value \cite{resnet}.
+      In the proposed solution I will reference to ResNet34 and ResNet50, two models of the same family but with different number of layers.
+   \subsection{EfficientNet}
+      The idea behind this family of Convolutional Neural Network is to scale a baseline model, called EfficientNet-B0, in width depth and resolution by a costant ratio in order to obtain higher accuracy. This process allows to keep the number of parameters lower in comparison to same accuracy-level models \cite{efficientnet}. In the proposed solution I will reference to EfficientNet-B3, a good tradeoff between acuracy level and network size.
 
 \textcolor{blue}{
 In this section you should discuss published work that relates to your project. This is expected to be full of references, meaning that you have read the existing literature and you know what you are working on very well. This is not just a list or works, but you are not supposed to cluster papers that use similar approaches and compare them each other using very short sentences. I strongly suggest to check \cite{steinhardt, lipton} blog posts for some good practices in writing a paper. A quote that I like very much is \emph{``Research is spending 6 hours reading 35 papers, so you can write one sentence containing 2 references''} \cite{twit:ref}. Keep it in mind while you are writing!
@@ -98,9 +98,9 @@ In this section you should discuss published work that relates to your project. 
 %------------------------------------------------------------------------
 \graphicspath{ {./Resources/} }
 \section{Dataset analysis}
-   The first, and one of the most important phase of every Machine Learning task, is the analysis of input data. In this problem we have 12568 greyscale images of size 1600x256x3 that comes from real camera shot of steel sheets and a data file (.csv) that contains all the information in order to generate each defective mask; this dataset is obtained from \cite{Severstal}.The types of defects can be classified in Pitting (Figure \ref{fig:defect1}), Inclusion (Figure \ref{fig:defect2}), Scratches (Figure \ref{fig:defect3}) and Corrosion (Figure \ref{fig:defect4}).
+   The first, and one of the most important phase of every Machine Learning task, is the analysis of input data. In this problem we have 12568 greyscale images of size 1600x256x3 that comes from real camera shot of steel sheets and a data file (.csv) that contains all the information in order to generate each defective mask; this dataset is obtained from the corresponding Kaggle competition \cite{Severstal}.The types of defects can be classified in Pitting (Figure \ref{fig:defect1}), Inclusion (Figure \ref{fig:defect2}), Scratches (Figure \ref{fig:defect3}) and Corrosion (Figure \ref{fig:defect4}).
 
-   \begin{figure}[t]
+   \begin{figure}[h]
       \centering
       \caption{Pitting} \label{fig:defect1}
       \includegraphics[scale=0.3]{Img_Defect1}
@@ -144,6 +144,15 @@ In this section you should discuss published work that relates to your project. 
       \includegraphics[scale=0.48]{Img_SecondApproach}
    \end{figure}
 
+
+   \subsection{Multiclass Semantic Segmentation}
+   The semantic segmentation task is performed by a U-Net based model, in my experiments I have tried 3 different U-Net encoders: ResNet34, ResNet50 and EfficientNet-B3, in the following I will present only the EfficientNet-B3 model since it has given the best result.
+   The main advantage of using custom encoders is that is possible to apply transfer-learning from pretrained weghts, this allows to transfer previous knowledge to the network. \\
+   The encoder part follows the EfficientNet-B3 architecture \cite{efficientnet}. The decoder part is a classical U-Net expansion path where each upsamling layer is concatenated with the corresponding downsampling one in the contracting part, followed by a block of Convolution, Batch-Normalization and ReLu layer. \\
+   The decision of the right activation layer at the end of the network tormented me for quite a long: even if Softmax is the straightforward choice for multiclass segmentation by definition, this means that I have to treat 'no Defect' pixels as a separate class altogether. From my observation this decision will stress even more the imbalanced data issue since for each pixel you have to decide the right class, where, as I presented in the dataset analysis, it is clar that almost the entire amount of pixels belong to the non defect group. The usage of Sigmoid activation function, instead, bring the network to perform 4 \textit{one vs all} indpependent decisions weather that pixel belongs to the corresponding class or not. 
+
+   \subsection{Binary Classification}
+   binary bla bla bla
 
 
 

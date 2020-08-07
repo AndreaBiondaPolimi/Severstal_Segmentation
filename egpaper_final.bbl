@@ -9,21 +9,21 @@ Authors.
 \newblock Face and Gesture submission ID 324. Supplied as additional material
   {\tt fg324.pdf}.
 
-\bibitem{twit:ref}
-{Bryan Gaensler}.
-\newblock {Tweet}, 2018.
-\newblock https://twitter.com/SciBry/status/989623027393531905.
+\bibitem{resnet}
+{Kaiming He, Xiangyu Zhang, Shaoqing Ren and Jian Sun}.
+\newblock {Deep Residual Learning for Image Recognition}, 2015.
+\newblock https://arxiv.org/pdf/1512.03385.pdf.
 
-\bibitem{steinhardt}
-{Jacob Steinhardt}.
-\newblock {Advice for Authors}, 2018.
-\newblock https://jsteinhardt.wordpress.com/2017/02/28/advice-for-authors/.
+\bibitem{efficientnet}
+{Mingxing Tan and Quoc V. Le}.
+\newblock {EfficientNet: Rethinking Model Scaling for Convolutional Neural
+  Networks}, 2019.
+\newblock https://arxiv.org/pdf/1905.11946.pdf.
 
-\bibitem{lipton}
-{Zachary C. Lipton}.
-\newblock {Heuristics for Scientific Writing (a Machine Learning Perspective)},
-  2018.
-\newblock
-  http://approximatelycorrect.com/2018/01/29/heuristics-technical-scientific-writing-machine-learning-perspective/.
+\bibitem{Unet}
+{Olaf Ronneberger, Philipp Fischer and Thomas Brox}.
+\newblock {U-Net: Convolutional Networks for Biomedical Image Segmentation},
+  2015.
+\newblock https://arxiv.org/pdf/1505.04597.pdf.
 
 \end{thebibliography}

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 20.6.29) (preloaded format=pdflatex 2020.7.21)  5 AUG 2020 18:05
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 20.6.29) (preloaded format=pdflatex 2020.7.21)  7 AUG 2020 20:59
 entering extended mode
 **c:/Users/Andrea/Desktop/Severstal_Segmentation/egpaper_final.tex
 (c:/Users/Andrea/Desktop/Severstal_Segmentation/egpaper_final.tex
@@ -319,6 +319,15 @@ File: ts1ptm.fd 2001/06/04 font definitions for TS1/ptm.
 
 
 ]
+
+LaTeX Warning: Citation `steinhardt' on page 2 undefined on input line 93.
+
+
+LaTeX Warning: Citation `lipton' on page 2 undefined on input line 93.
+
+
+LaTeX Warning: Citation `twit:ref' on page 2 undefined on input line 93.
+
 <./Resources/Img_Defect1.png, id=21, 797.22844pt x 127.97812pt>
 File: ./Resources/Img_Defect1.png Graphic file (type png)
 <use ./Resources/Img_Defect1.png>
@@ -359,7 +368,8 @@ Overfull \hbox (2.26027pt too wide) in paragraph at lines 112--113
  [][] 
  []
 
-<./Resources/Img_ClassImbalance.png, id=26, 552.56438pt x 107.65219pt>
+[2 <./Resources/Img_Defect1.png> <./Resources/Img_Defect2.png> <./Resources/Img_Defect3.png> <./Resources/Img_Defect4.png>]
+<./Resources/Img_ClassImbalance.png, id=46, 552.56438pt x 107.65219pt>
 File: ./Resources/Img_ClassImbalance.png Graphic file (type png)
 <use ./Resources/Img_ClassImbalance.png>
 Package pdftex.def Info: ./Resources/Img_ClassImbalance.png  used on input line 120.
@@ -369,7 +379,7 @@ Overfull \hbox (11.51572pt too wide) in paragraph at lines 120--121
  [][] 
  []
 
-<./Resources/Img_FirstApproach.png, id=29, 457.71pt x 100.87688pt>
+<./Resources/Img_FirstApproach.png, id=49, 457.71pt x 100.87688pt>
 File: ./Resources/Img_FirstApproach.png Graphic file (type png)
 <use ./Resources/Img_FirstApproach.png>
 Package pdftex.def Info: ./Resources/Img_FirstApproach.png  used on input line 135.
@@ -379,8 +389,7 @@ Overfull \hbox (14.60535pt too wide) in paragraph at lines 135--136
  [][] 
  []
 
-[2 <./Resources/Img_Defect1.png> <./Resources/Img_Defect2.png> <./Resources/Img_Defect3.png> <./Resources/Img_Defect4.png> <./Resources/Img_ClassImbalance.png> <./Resources/Img_FirstApproach.png>]
-<./Resources/Img_SecondApproach.png, id=57, 508.90125pt x 217.5628pt>
+<./Resources/Img_SecondApproach.png, id=51, 508.90125pt x 217.5628pt>
 File: ./Resources/Img_SecondApproach.png Graphic file (type png)
 <use ./Resources/Img_SecondApproach.png>
 Package pdftex.def Info: ./Resources/Img_SecondApproach.png  used on input line 144.
@@ -391,75 +400,47 @@ Overfull \hbox (7.13388pt too wide) in paragraph at lines 144--145
  []
 
 
-Underfull \vbox (badness 2653) has occurred while \output is active []
+LaTeX Warning: `h' float specifier changed to `ht'.
 
- [3 <./Resources/Img_SecondApproach.png>] (egpaper_final.bbl (egpaper_final.brf)
+
+Underfull \vbox (badness 3029) has occurred while \output is active []
+
+ [3 <./Resources/Img_ClassImbalance.png> <./Resources/Img_FirstApproach.png> <./Resources/Img_SecondApproach.png>] [4] (egpaper_final.bbl (egpaper_final.brf)
 \tf@brf=\write3
 \openout3 = `egpaper_final.brf'.
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 16--16
-[]\OT1/ptm/m/n/9 Bryan Gaensler.  Tweet, 2018.
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 16--16
-\OT1/ptm/m/n/9 https://twitter.com/SciBry/status/989623027393531905.
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 21--21
-[]\OT1/ptm/m/n/9 Jacob Stein-hardt.  Ad-vice for Au-thors, 2018.
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 21--21
-\OT1/ptm/m/n/9 https://jsteinhardt.wordpress.com/2017/02/28/advice-for-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 28--28
-[]\OT1/ptm/m/n/9 Zachary C. Lip-ton.  Heuris-tics for Sci-en-tific
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 28--28
-\OT1/ptm/m/n/9 Writ-ing (a Ma-chine Learn-ing Per-spec-tive), 2018.
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 28--28
-\OT1/ptm/m/n/9 http://approximatelycorrect.com/2018/01/29/heuristics-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 28--28
-\OT1/ptm/m/n/9 technical-scientific-writing-machine-learning-perspective/.
+Underfull \hbox (badness 2443) in paragraph at lines 16--16
+[]\OT1/ptm/m/n/9 Kaiming He, Xi-angyu Zhang, Shao-qing Ren and Jian
  []
 
 )
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 270.
- [4] [5]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 270.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 279.
+ [5]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 279.
  (egpaper_final.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 270.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 270.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 279.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 279.
 Package rerunfilecheck Info: File `egpaper_final.brf' has not changed.
-(rerunfilecheck)             Checksum: 1874B73123E0067F239EFF7AF18869C9;193.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 270.
+(rerunfilecheck)             Checksum: 8AC3A6309B9DED8466E8C0716E370F05;383.
+
+
+LaTeX Warning: There were undefined references.
+
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 279.
  ) 
 Here is how much of TeX's memory you used:
- 6938 strings out of 481225
- 105042 string characters out of 2905705
- 370440 words of memory out of 3000000
- 22307 multiletter control sequences out of 15000+200000
+ 6942 strings out of 481225
+ 105079 string characters out of 2905705
+ 370438 words of memory out of 3000000
+ 22310 multiletter control sequences out of 15000+200000
  562906 words of font info for 89 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
- 56i,12n,45p,761b,344s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 56i,12n,45p,813b,359s stack positions out of 5000i,500n,10000p,200000b,50000s
 {C:/Users/Andrea/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/base/8r.enc}<C:/Users/Andrea/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi9.pfb><C:/Users/Andrea/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr9.pfb><C:/Users/Andrea/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/Andrea/AppData/Local/Programs/MiKTeX/fonts/type1/urw/courier/ucrr8a.pfb><C:/Users/Andrea/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmb8a.pfb><C:/Users/Andrea/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmr8a.pfb><C:/Users/Andrea/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmri8a.pfb>
-Output written on egpaper_final.pdf (5 pages, 823550 bytes).
+Output written on egpaper_final.pdf (5 pages, 827612 bytes).
 PDF statistics:
- 134 PDF objects out of 1000 (max. 8388607)
- 45 named destinations out of 1000 (max. 500000)
+ 137 PDF objects out of 1000 (max. 8388607)
+ 46 named destinations out of 1000 (max. 500000)
  36 words of extra memory for PDF output out of 10000 (max. 10000000)
 
