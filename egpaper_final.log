@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 20.6.29) (preloaded format=pdflatex 2020.7.21)  7 AUG 2020 20:59
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 20.6.29) (preloaded format=pdflatex 2020.7.21)  8 AUG 2020 16:36
 entering extended mode
 **c:/Users/Andrea/Desktop/Severstal_Segmentation/egpaper_final.tex
 (c:/Users/Andrea/Desktop/Severstal_Segmentation/egpaper_final.tex
@@ -415,32 +415,32 @@ Underfull \hbox (badness 2443) in paragraph at lines 16--16
  []
 
 )
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 279.
- [5]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 279.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 304.
+ [5] [6]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 304.
  (egpaper_final.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 279.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 279.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 304.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 304.
 Package rerunfilecheck Info: File `egpaper_final.brf' has not changed.
-(rerunfilecheck)             Checksum: 8AC3A6309B9DED8466E8C0716E370F05;383.
+(rerunfilecheck)             Checksum: C91F3D2C7055D8766AD4EC05F460F8A2;428.
 
 
 LaTeX Warning: There were undefined references.
 
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 279.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 304.
  ) 
 Here is how much of TeX's memory you used:
- 6942 strings out of 481225
- 105079 string characters out of 2905705
- 370438 words of memory out of 3000000
+ 6951 strings out of 481225
+ 105176 string characters out of 2905705
+ 371438 words of memory out of 3000000
  22310 multiletter control sequences out of 15000+200000
  562906 words of font info for 89 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
- 56i,12n,45p,813b,359s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 56i,12n,45p,813b,344s stack positions out of 5000i,500n,10000p,200000b,50000s
 {C:/Users/Andrea/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/base/8r.enc}<C:/Users/Andrea/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi9.pfb><C:/Users/Andrea/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr9.pfb><C:/Users/Andrea/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/Andrea/AppData/Local/Programs/MiKTeX/fonts/type1/urw/courier/ucrr8a.pfb><C:/Users/Andrea/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmb8a.pfb><C:/Users/Andrea/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmr8a.pfb><C:/Users/Andrea/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmri8a.pfb>
-Output written on egpaper_final.pdf (5 pages, 827612 bytes).
+Output written on egpaper_final.pdf (6 pages, 831255 bytes).
 PDF statistics:
- 137 PDF objects out of 1000 (max. 8388607)
- 46 named destinations out of 1000 (max. 500000)
+ 153 PDF objects out of 1000 (max. 8388607)
+ 55 named destinations out of 1000 (max. 500000)
  36 words of extra memory for PDF output out of 10000 (max. 10000000)
 

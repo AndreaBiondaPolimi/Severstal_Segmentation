@@ -136,7 +136,7 @@ In this section you should discuss published work that relates to your project. 
    \end{figure}
 
    This method has a very good capibility in defect recognition, but at the same time it hardly distinguishes real defects from false defects due to their similar pattern \textcolor{red}{(an example on figure xxx )}. This problem is higly penalized in the case in which no defects is present with Dice metric \textcolor{red}{(link to the formulae)}, that could be reasonable in high capacity foundries where the goal is also reduce at minimum the false scrap and so wasting resources (if the machine labels part of the steel sheet as defective it will be throwed away).\\
-   For this reason the second, and real proposed approach, is to train a Binary classifier with the goal of distinguish defective from non-defective images. The idea is to use the classifier to decide, during inference time, weather an image could contain a defect or not and if the answer is true pass it to the U-Net to segment the defect, otherwise the segmentation phase is skipped and whole-zero masks are generated as heatmaps (Figure \ref{fig:secondApproach}).\\
+   For this reason the second, and real proposed approach, is to train a Binary classifier with the goal of distinguish defective from non-defective images. The idea is to use the classifier to decide, during inference time, weather an image could contain a defect or not and if the answer is true pass it to the U-Net to segment the defect, otherwise the segmentation inference  is skipped and whole-zero masks are generated as heatmaps (Figure \ref{fig:secondApproach}).\\
    This pipeline will reduce the false scrap and increase Dice coefficient as you can see in the result section \textcolor{red}{(result section)}.
     
    \begin{figure}[h]
@@ -146,13 +146,14 @@ In this section you should discuss published work that relates to your project. 
 
 
    \subsection{Multiclass Semantic Segmentation}
-   The semantic segmentation task is performed by a U-Net based model, in my experiments I have tried 3 different U-Net encoders: ResNet34, ResNet50 and EfficientNet-B3, in the following I will present only the EfficientNet-B3 model since it has given the best result.
+   The semantic segmentation task is performed by a U-Net based model, in my experiments I have tried 3 different U-Net encoders: ResNet34, ResNet50 and EfficientNet-B3, in the following I will refer to EfficientNet-B3 model only since it has given the best result.
    The main advantage of using custom encoders is that is possible to apply transfer-learning from pretrained weghts, this allows to transfer previous knowledge to the network. \\
    The encoder part follows the EfficientNet-B3 architecture \cite{efficientnet}. The decoder part is a classical U-Net expansion path where each upsamling layer is concatenated with the corresponding downsampling one in the contracting part, followed by a block of Convolution, Batch-Normalization and ReLu layer. \\
    The decision of the right activation layer at the end of the network tormented me for quite a long: even if Softmax is the straightforward choice for multiclass segmentation by definition, this means that I have to treat 'no Defect' pixels as a separate class altogether. From my observation this decision will stress even more the imbalanced data issue since for each pixel you have to decide the right class, where, as I presented in the dataset analysis, it is clar that almost the entire amount of pixels belong to the non defect group. The usage of Sigmoid activation function, instead, bring the network to perform 4 \textit{one vs all} indpependent decisions weather that pixel belongs to the corresponding class or not. 
 
    \subsection{Binary Classification}
-   binary bla bla bla
+   The classification task is delegated to a standard binary classifier, in my experiments I have tried two different models: ResNet34 and ResNet50, in the following I will refer to \textcolor{red}{ResNet50} only since it has given the best result.
+   The structure of the classifier follows the classical ResNet50 architecture \cite{resnet}, the last part of Fully Connected layers is removed and replaced by a Global Averaging Pooling layer attached with a sigmoid activation over the single binary output.
 
 
 
@@ -194,17 +195,41 @@ zoom in to see tiny details on a graphic.}
 
 %------------------------------------------------------------------------
 \section{Experiments}
-In this section you validate your method showing the experiments that you performed. The experiments will vary depending on the project, but you might compare with previously published methods, perform an ablation study to determine the impact of various components of your system, experiment with different hyperparameters or architectural choices, use visualization techniques to gain insight into how your model works, discuss common failure modes of your model, etc. You should include graphs, tables, or other figures to illustrate your experimental results. Divide in subsections or paragraphs to help the reader navigate in your paper.
+   \subsection{Segmentation}
+      \paragraph{data preparation}
+         random crop: balanced and avoid black
+         use defective only or not (with experiments on effb3)
+      \paragraph{experiment setup}
+         training parameters
+      \paragraph{results and discussion}
+         compare 3 encoders
+         compare defective only or not
+         image of results and false defect mistake
+   
+   \subsection{Classification}
+      \paragraph{data preparation}
+         no data preparation
+      \paragraph{experiment setup}
+         training parameters
+      \paragraph{results and discussion}
+         confusion matrix
+         image of results(?)
 
+
+
+\textcolor{blue}{
+In this section you validate your method showing the experiments that you performed. The experiments will vary depending on the project, but you might compare with previously published methods, perform an ablation study to determine the impact of various components of your system, experiment with different hyperparameters or architectural choices, use visualization techniques to gain insight into how your model works, discuss common failure modes of your model, etc. You should include graphs, tables, or other figures to illustrate your experimental results. Divide in subsections or paragraphs to help the reader navigate in your paper.
 \paragraph{Datasets.}
 Describe the data you are working with for your project. Usually you need to explain what type of data is it, how much data are you working with and if you applied any pre-processing, filtering, or other special treatment to use it. Remember that you have to cite each dataset you used in your project if it has been published from someone else. Instead, if you collected it by yourself you have to describe accurately how you gathered (and labeled) your data. 
-
 \paragraph{Experiments setup.}
 Here you describe all the architectural choices of your model, the hyper-parameters of your model, \eg optimizer, learning rate, momentum, batch size and if you cross-validate on them. 
-
 \paragraph{Results and discussion.}
 Discuss your results and compare with other methods. You can also perform an \emph{ablation study} on your model switching on and off some components to understand their contributions.
+}
 
+
+
+%-----------------------------------------------------------------------
 \section{Conclusion} 
 Summarize your key results. What have you learned from the project and suggest future extensions or new applications of your ideas.
 
