@@ -6,6 +6,10 @@
 \usepackage{graphicx}
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage[euler]{textgreek}
+\usepackage{multirow}
+\usepackage{graphicx}
+\usepackage{booktabs}
 
 % Include other packages here, before hyperref.
 
@@ -81,7 +85,7 @@ Politecnico di Milano\\
 \section{Related work}
    Since the output of the problem is a pixel-wise label for the input image, it’s essentially a semantic segmentation task. In our case it is also used a binary classifier to refine the results.
    \subsection{U-Net}
-      The baseline architecture used in the segmentation phase is the so called U-Net that is composed of two concatenated parts: the contracting path (or down-sampling network or encoder network) works as classical Convolutional Neural Network (CNN) to extract meaningful feature from the image, while the expansive path (or up-sampling network or decoder network) builds an high resolution output starting from the feature extracted during the first phase. The bigger contribution taken by this architecture is that each up-sampling layer is enriched with features information extracted in the corresponding downsampling layer network in order to achieve higher semantic levels \cite{Unet}. 
+      The baseline architecture used in the segmentation phase is the so called U-Net that is composed of two concatenated parts: the contracting path (or down-sampling network or encoder network) works as classical Fully Convolutional Neural Network (FCNN) to extract meaningful feature from the image, while the expansive path (or up-sampling network or decoder network) builds an high resolution output starting from the feature extracted during the first phase. The bigger contribution taken by this architecture is that each up-sampling layer is enriched with features information extracted in the corresponding downsampling layer network in order to achieve higher semantic levels \cite{Unet}. 
    \subsection{Residual Networks} 
       This family of Convolutional Neural Network is build to face the degradation problem of very deep networks. The related paper proposes that such degradation is not caused by overfitting, but instead due to the well-known vanishing gradient problem. The main idea is to add an identity shortcut connection between blocks (group of convolutional layers), in such a way that each one learn features from both previous block and input value \cite{resnet}.
       In the proposed solution I will reference to ResNet34 and ResNet50, two models of the same family but with different number of layers.
@@ -135,7 +139,7 @@ In this section you should discuss published work that relates to your project. 
       \includegraphics[scale=0.55]{Img_FirstApproach}
    \end{figure}
 
-   This method has a very good capibility in defect recognition, but at the same time it hardly distinguishes real defects from false defects due to their similar pattern \textcolor{red}{(an example on figure xxx )}. This problem is higly penalized in the case in which no defects is present with Dice metric \textcolor{red}{(link to the formulae)}, that could be reasonable in high capacity foundries where the goal is also reduce at minimum the false scrap and so wasting resources (if the machine labels part of the steel sheet as defective it will be throwed away).\\
+   This method has a very good capibility in defect recognition, but at the same time it hardly distinguishes real defects from false defects due to their similar pattern (an example on Figure \ref{fig:result1} and \ref{fig:result2}). This problem is higly penalized in the case in which no defects is present with Dice metric \eqref{eq:dice_loss}, that could be reasonable in high capacity foundries where the goal is also reduce at minimum the false scrap and so wasting resources (if the machine labels part of the steel sheet as defective it will be throwed away).\\
    For this reason the second, and real proposed approach, is to train a Binary classifier with the goal of distinguish defective from non-defective images. The idea is to use the classifier to decide, during inference time, weather an image could contain a defect or not and if the answer is true pass it to the U-Net to segment the defect, otherwise the segmentation inference  is skipped and whole-zero masks are generated as heatmaps (Figure \ref{fig:secondApproach}).\\
    This pipeline will reduce the false scrap and increase Dice coefficient as you can see in the result section \textcolor{red}{(result section)}.
     
@@ -146,13 +150,13 @@ In this section you should discuss published work that relates to your project. 
 
 
    \subsection{Multiclass Semantic Segmentation}
-   The semantic segmentation task is performed by a U-Net based model, in my experiments I have tried 3 different U-Net encoders: ResNet34, ResNet50 and EfficientNet-B3, in the following I will refer to EfficientNet-B3 model only since it has given the best result.
+   The semantic segmentation task is performed by a U-Net based model, in my experiments I have tried 3 different U-Net encoders: ResNet34, ResNet50 and EfficientNet-B3, in the following I will refer to EfficientNet-B3 model only since it has given the best result \ref{table:res_encoders}.
    The main advantage of using custom encoders is that is possible to apply transfer-learning from pretrained weghts, this allows to transfer previous knowledge to the network. \\
    The encoder part follows the EfficientNet-B3 architecture \cite{efficientnet}. The decoder part is a classical U-Net expansion path where each upsamling layer is concatenated with the corresponding downsampling one in the contracting part, followed by a block of Convolution, Batch-Normalization and ReLu layer. \\
    The decision of the right activation layer at the end of the network tormented me for quite a long: even if Softmax is the straightforward choice for multiclass segmentation by definition, this means that I have to treat 'no Defect' pixels as a separate class altogether. From my observation this decision will stress even more the imbalanced data issue since for each pixel you have to decide the right class, where, as I presented in the dataset analysis, it is clar that almost the entire amount of pixels belong to the non defect group. The usage of Sigmoid activation function, instead, bring the network to perform 4 \textit{one vs all} indpependent decisions weather that pixel belongs to the corresponding class or not. 
 
    \subsection{Binary Classification}
-   The classification task is delegated to a standard binary classifier, in my experiments I have tried two different models: ResNet34 and ResNet50, in the following I will refer to \textcolor{red}{ResNet50} only since it has given the best result.
+   The classification task is delegated to a standard binary classifier, in my experiments I have tried two different models: ResNet34 and ResNet50, in the following I will refer to ResNet50 only since it has given the best result.
    The structure of the classifier follows the classical ResNet50 architecture \cite{resnet}, the last part of Fully Connected layers is removed and replaced by a Global Averaging Pooling layer attached with a sigmoid activation over the single binary output.
 
 
@@ -195,26 +199,112 @@ zoom in to see tiny details on a graphic.}
 
 %------------------------------------------------------------------------
 \section{Experiments}
+   The entire pipeline is trained separately, so for legibility purpose I will divide the two experiments and then provide the final results using the Dice coefficient \eqref{eq:dice_loss}.
+   \begin{equation}\label{eq:dice_loss}
+      L_{dice} = \frac{2 * y_{pred} * y_{true}}{y_{pred} + y_{true}}
+   \end{equation}
    \subsection{Segmentation}
-      \paragraph{data preparation}
-         random crop: balanced and avoid black
-         use defective only or not (with experiments on effb3)
-      \paragraph{experiment setup}
-         training parameters
-      \paragraph{results and discussion}
-         compare 3 encoders
-         compare defective only or not
-         image of results and false defect mistake
+      \paragraph{Data preparation.}
+         The first operation applied is to crop the images due to the large dimension of the input data and the corresponding limited amount of memory. Thanks to the idea behind Fully Convolutional Neural Network is possible to train and predict on different image dimension with good output resolution \cite{FCNN}.
+         In order to apply a first level of data augmentation the crop size vary on different epochs, also completely dark crops are prevented since does not bring any useful information.
+         In order to face imbalanced dataset issue, the batch is composed of all images' classes in euqal proportion (incuded non defect class).
+
+      \paragraph{Training parameters}
+         \begin{itemize}
+            \item Data augmentation is applied whith both random spatial transformations (flip, rotation and shifting) and color augmentation (brightness and contrast).
+            \item The crop size used are (5,256,384) and (5,256,512) that will interchange on epochs, where the first number in the tuple identifies the batch size.
+            \item The loss function varies during the training: the first 70 epochs were trained using a balanced combination of two loss functions Binary Cross Entropy and Dice \eqref{eq:dice_loss} that provides a tradeoff between accuracy and precision \eqref{eq:loss_bce_dice}. Finally the model is fine tuned for other 40 epochs using Tversky loss \eqref{eq:loss_tversky} with \textalpha=0.3 to reduce false positive rate. 
+            \begin{equation}\label{eq:loss_bce_dice}
+               L_{bce\_dice} = L_{dice} + L_{bce}
+            \end{equation}
+            \begin{equation}\label{eq:loss_tversky}
+               L_{Tversky} = \frac{TP}{TP + \alpha*FN + (1-\alpha)*FP}
+            \end{equation}
+            \item The network is optimized using Adam, with an initial learning rate of $ 10^{-3} $ that is reduced with a constant factor of 0.5 every time it reaches a plateau long three epochs.
+         \end{itemize}
+
+      \paragraph{Experimental results and observations}
+         The followig results refers to tests on segmentation model only.
+         \begin{table}[h]
+            \centering
+            \begin{tabular}{||c c||} 
+            \hline
+            Encoder model & Dice coefficient\\ [0.5ex] 
+            \hline\hline
+            ResNet34 & XXX \\ 
+            \hline
+            ResNet50 & XXX \\
+            \hline
+            EfficientNet-B3 & 0.607 \\
+            \hline
+         \end{tabular}
+        \caption{Results on different encoders}
+        \label{table:res_encoders}
+      \end{table}
+         \\As I mention before, U-Net provides a very accurate identification of defects but hardly distinguishes real defects from false defects that ususally are identified as small scarfs in the steel (Figure \ref{fig:result1}). 
+         \begin{figure}[h]
+            \centering
+            \caption{Real (purple) vs False (blue) defects} \label{fig:result1}
+            \includegraphics[scale=0.5]{Img_Result1.png}
+         \end{figure}
+         \\This would not be a big issue if the challenges' metrics do not penalize so much false defect on non-defective images, even if they are a small proportion of the entire image.(Figure \ref{fig:result2}).  
+         \begin{figure}[h]
+            \centering
+            \caption{False defects on good image} \label{fig:result2}
+            \includegraphics[scale=0.355]{Img_Result2.png}
+         \end{figure}
    
    \subsection{Classification}
-      \paragraph{data preparation}
-         no data preparation
-      \paragraph{experiment setup}
-         training parameters
-      \paragraph{results and discussion}
-         confusion matrix
-         image of results(?)
+      \paragraph{Data preparation} 
+         For classification I did not apply any data preprocessing.
+                 
+      \paragraph{Training parameters}
+      \begin{itemize}
+         \item Data augmentation is applied whith both random spatial transformations (flip, rotation and shifting) and color augmentation (brightness and contrast).
+         \item The images are fed on their original size of (4,256,1600), where the first number in the tuple identifies the batch size.
+         \item The loss function is Binary Cross Entropy. 
+         \item The network is optimized using Adam, with an initial learning rate of $ 10^{-3} $ that is reduced with a constant factor of 0.5 every time it reaches a plateau long three epochs.
+      \end{itemize}
 
+      \paragraph{Experimental results and observations}
+         The followig results refers to tests on classification model only.
+         \begin{table}[!htb]
+            \begin{minipage}{.5\linewidth}
+               \begin{tabular}{cc|cc}
+               \multicolumn{1}{c}{} &\multicolumn{1}{c}{} &\multicolumn{2}{c}{Predicted} \\ 
+               \multicolumn{1}{c}{} & 
+               \multicolumn{1}{c|}{} & 
+               \multicolumn{1}{c}{True} & 
+               \multicolumn{1}{c}{False} \\ \hline
+               \multirow[c]{2}{*}{\rotatebox[origin=tr]{90}{Real}}
+               & True  & 662 & 54   \\[1.5ex]
+               & False  & 373   & 711 \\ \hline
+               \end{tabular}
+               \caption{Resnet34}
+               \label{table:resnet34_cm}
+            \end{minipage}%
+            \begin{minipage}{.5\linewidth}
+               \begin{tabular}{@{}cc|cc@{}}
+               \multicolumn{1}{c}{} &\multicolumn{1}{c}{} &\multicolumn{2}{c}{Predicted} \\ 
+               \multicolumn{1}{c}{} & 
+               \multicolumn{1}{c|}{} & 
+               \multicolumn{1}{c}{True} & 
+               \multicolumn{1}{c}{False} \\ 
+               \cline{2-4}
+               \multirow[c]{2}{*}{\rotatebox[origin=tr]{90}{Real}}
+               & True  & 695 & 21   \\[1.5ex]
+               & False  & 365   & 719 \\ 
+               \cline{2-4}
+               \end{tabular}
+               \caption{Resnet50}
+               \label{table:resnet50_cm}
+            \end{minipage} 
+         \end{table} 
+         As can be seen from the confusion matrix above, the classification helps to identify most of the non-defective images and avoid the segmentation step, that in some cases will creates only problems. The most important thing here is to keep the False Negative rate as small as possible, in order to not skip the segmentation of defective images.
+      
+      
+   \subsection{Compelte pipeline}
+      aaa
 
 
 \textcolor{blue}{

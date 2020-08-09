@@ -6,50 +6,52 @@ The style file: ieee.bst
 Reallocating 'name_of_file' (item size: 1) to 6 items.
 Database file #1: egbib.bib
 Warning--I'm ignoring Severstal's extra "note" field
---line 68 of file egbib.bib
+--line 65 of file egbib.bib
 Warning--I didn't find a database entry for "steinhardt"
 Warning--I didn't find a database entry for "lipton"
 Warning--I didn't find a database entry for "twit:ref"
 Warning--to sort, need author or key in Severstal
-You've used 5 entries,
+Warning--empty title in FCNN
+Warning--empty journal in FCNN
+You've used 6 entries,
             2120 wiz_defined-function locations,
-            526 strings with 4470 characters,
-and the built_in function-call counts, 992 in all, are:
-= -- 87
-> -- 29
+            530 strings with 4627 characters,
+and the built_in function-call counts, 1235 in all, are:
+= -- 109
+> -- 42
 < -- 0
-+ -- 14
-- -- 8
-* -- 32
-:= -- 158
-add.period$ -- 13
-call.type$ -- 5
-change.case$ -- 18
++ -- 19
+- -- 12
+* -- 47
+:= -- 202
+add.period$ -- 16
+call.type$ -- 6
+change.case$ -- 22
 chr.to.int$ -- 0
-cite$ -- 6
-duplicate$ -- 35
-empty$ -- 112
-format.name$ -- 8
-if$ -- 217
+cite$ -- 9
+duplicate$ -- 45
+empty$ -- 129
+format.name$ -- 12
+if$ -- 264
 int.to.chr$ -- 0
-int.to.str$ -- 5
-missing$ -- 0
-newline$ -- 26
-num.names$ -- 8
-pop$ -- 48
+int.to.str$ -- 6
+missing$ -- 1
+newline$ -- 31
+num.names$ -- 10
+pop$ -- 56
 preamble$ -- 1
-purify$ -- 14
+purify$ -- 18
 quote$ -- 0
-skip$ -- 35
+skip$ -- 42
 stack$ -- 0
-substring$ -- 26
+substring$ -- 31
 swap$ -- 5
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 20
-warning$ -- 1
-while$ -- 8
-width$ -- 6
-write$ -- 47
-(There were 5 warnings)
+type$ -- 24
+warning$ -- 3
+while$ -- 10
+width$ -- 7
+write$ -- 56
+(There were 7 warnings)
