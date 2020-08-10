@@ -141,7 +141,7 @@ In this section you should discuss published work that relates to your project. 
 
    This method has a very good capibility in defect recognition, but at the same time it hardly distinguishes real defects from the false ones, due to their similar pattern (an example on Figure \ref{fig:result1} and \ref{fig:result2}). This problem is highly penalized in the case in which no defects are present with Dice metric \eqref{eq:dice_loss}, that could be reasonable in high capacity foundries, where the goal is also to reduce at minimum the false scrap and so the waste of resources (if the machine labels part of the steel sheet as defective, it will be thrown away).\\
    For this reason, the second and real proposed approach is to train a Binary classifier for the purpose of distinguishing defective from non-defective images. The idea is to use the classifier to decide, during inference time, whether an image could contain a defect or not and, if the answer is true, to pass it to the U-Net to segment the defect, otherwise the segmentation inference is skipped and whole-zero masks are generated as heatmaps (Figure \ref{fig:secondApproach}).\\
-   This pipeline will reduce the false scrap and increase Dice coefficient, as it is presented in the result section \textcolor{red}{(result section)}.
+   This pipeline will reduce the false scrap and increase Dice coefficient, as it is presented in the result section (Table \ref{table:res_finals}.).
     
    \begin{figure}[h]
       \caption{Proposed approach: pipelined inference } \label{fig:secondApproach}
@@ -150,10 +150,10 @@ In this section you should discuss published work that relates to your project. 
 
 
    \subsection{Multiclass Semantic Segmentation}
-   The semantic segmentation task is performed by a U-Net based model. In my experiments, I have tried three different U-Net encoders: ResNet34, ResNet50 and EfficientNet-B3. In the following, I will refer to the EfficientNet-B3 model only since it has given the best result \ref{table:res_encoders}.
+   The semantic segmentation task is performed by a U-Net based model. In my experiments, I have tried three different U-Net encoders: ResNet34, ResNet50 and EfficientNet-B3. In the following, I will refer to the EfficientNet-B3 model only since it has given the best result (Table \ref{table:res_encoders}.).
    The main advantage of using custom encoders is that it is possible to apply transfer-learning from pretrained weghts, allowing to transfer previous knowledge to the network. \\
    The encoder part follows the EfficientNet-B3 architecture \cite{efficientnet}. The decoder part, instead, is a classical U-Net expansion path, where each upsampling layer is concatenated with the corresponding downsampling one in the contracting part, followed by a block of Convolution, Batch-Normalization and ReLu layer. \\
-   The decision about the right activation layer at the end of the network was a great challenge for quite a long time: even if Softmax is the straightforward choice for multiclass segmentation by definition, this means that I have to treat 'no Defect' pixels as a separate class altogether. In my opinion, this decision will stress even more the imbalanced data issue since for each pixel it is necessary to decide the right class, where, as I presented in the dataset analysis, it is clear that almost the entire amount of pixels belongs to the non-defective group. The usage of Sigmoid activation function, instead, brings the network to perform four \textit{one vs all} independent decisions, whether that pixel belongs to the corresponding class or not. 
+   The decision about the right activation layer at the end of the network was a great challenge for quite a long time: even if Softmax is the straightforward choice for multiclass segmentation by definition, this means that I have to treat 'no Defect' pixels as a separate class altogether. In my opinion, this decision will stress even more the imbalanced data issue since for each pixel it is necessary to decide the right class, where, as I presented in the dataset analysis, it is clear that almost the entire amount of pixels belongs to the non-defective group. The usage of Sigmoid activation function, instead, brings the network to perform four \textit{one vs all} independent decisions, whether that pixel belongs to the corresponding class or not. The experiment results are inline with the above intuition (Table \ref{table:res_encoders})
 
    \subsection{Binary Classification}
    The classification task is delegated to a standard binary classifier. In my experiments I have tried two different models: ResNet34 and ResNet50. In the following, I will refer to ResNet50 only, because it has given the best result.
@@ -227,27 +227,30 @@ zoom in to see tiny details on a graphic.}
          The followig results refer to tests on the segmentation model only.
          \begin{table}[h]
             \centering
-            \begin{tabular}{||c c||} 
+            \begin{tabular}{||c c c||} 
             \hline
-            Encoder model & Dice coefficient\\ [0.5ex] 
+            Encoder model & Activation function & Dice metric\\ [0.4ex] 
             \hline\hline
-            ResNet34 & XXX \\ 
+            ResNet34 & Sigmoid & XXX \\ 
             \hline
-            ResNet50 & XXX \\
+            ResNet50 & Sigmoid & XXX \\
             \hline
-            EfficientNet-B3 & 0.607 \\
+            \textbf{EfficientNet-B3} & \textbf{Sigmoid} & \textbf{0.607} \\
             \hline
-         \end{tabular}
-        \caption{Results on different encoders}
-        \label{table:res_encoders}
-      \end{table}
-         \\As I mentioned before, U-Net provides a very accurate identification of defects, but hardly distinguishes real defects from false defects that usually are identified as small scarfs in the steel (Figure \ref{fig:result1}). 
+            EfficientNet-B3 & Softmax & XXX \\
+            \hline
+            \end{tabular}
+            \caption{Results on different encoders and activation functions}
+            \label{table:res_encoders}
+         \end{table}
+
+         As I mentioned before, U-Net provides a very accurate identification of defects, but hardly distinguishes real defects from false defects that usually are identified as small scarfs in the steel (Figure \ref{fig:result1}). 
          \begin{figure}[h]
             \centering
             \caption{Real (purple) vs False (blue) defects} \label{fig:result1}
             \includegraphics[scale=0.5]{Img_Result1.png}
          \end{figure}
-         \\This would not be a big issue if the challenges' metrics do not penalize so much false defects on non-defective images, even if they are a small proportion of the entire image.(Figure \ref{fig:result2}).  
+         \\This would not be a big issue if the challenges' metrics do not penalize so much false defects on non-defective images, even if they are a small proportion of the entire image(Figure \ref{fig:result2}).  
          \begin{figure}[h]
             \centering
             \caption{False defects on good image} \label{fig:result2}
@@ -292,8 +295,8 @@ zoom in to see tiny details on a graphic.}
                \multicolumn{1}{c}{False} \\ 
                \cline{2-4}
                \multirow[c]{2}{*}{\rotatebox[origin=tr]{90}{Real}}
-               & True  & 695 & 21   \\[1.5ex]
-               & False  & 365   & 719 \\ 
+               & True  & \textbf{695} & \textbf{21}   \\[1.5ex]
+               & False  & \textbf{365}   & \textbf{719} \\ 
                \cline{2-4}
                \end{tabular}
                \caption{Resnet50}
@@ -301,10 +304,24 @@ zoom in to see tiny details on a graphic.}
             \end{minipage} 
          \end{table} 
          As it can be seen from the confusion matrix above, the classification helps to identify most of the non-defective images and avoid the segmentation step, that in some cases can create only problems. The most important thing here is to keep the False Negative rate as small as possible, in order not to skip the segmentation of defective images.
-      
-      
+            
    \subsection{Compelte pipeline}
-      aaa
+      The training procedure of the entire pipeline is simply composed of the two procedures stated above.
+      The following refers to the results coming from the two approaches, using EfficientNet-B3 as encoder model in the segmentation phase, and ResNet50 as binary classifier. 
+      \begin{table}[h]
+         \centering
+         \begin{tabular}{||c c||} 
+         \hline
+         Approach & Dice coefficient\\ [0.5ex] 
+         \hline\hline
+         Segmentation only & 0.607 \\ 
+         \hline
+         \textbf{Complete pipeline} & \textbf{0.729} \\
+         \hline
+         \end{tabular}
+         \caption{Results on different approaches}
+         \label{table:res_finals}
+      \end{table}
 
 
 \textcolor{blue}{
@@ -321,29 +338,19 @@ Discuss your results and compare with other methods. You can also perform an \em
 
 %-----------------------------------------------------------------------
 \section{Conclusion} 
-Summarize your key results. What have you learned from the project and suggest future extensions or new applications of your ideas.
+This project leverages the semantic segmentation and classification echniques to solve the steel defect detection problem. From the experiments arised that the combination of these two techniques works particularly weel as a tradeoff between accuracy and precision, in this particualar field.\\
+Possible future improvements could be:
+\begin{itemize}
+   \item Try ensamble learning in order to exploit different encoder models in the final result.
+   \item Fitht imabalanced dataset issue using a custom loss that takes in consideration the defect class distribution.
+\end{itemize}
+
+\textcolor{blue}{
+Summarize your key results. What have you learned from the project and suggest future extensions or new applications of your ideas.}
 
 
-\begin{figure}[t]
-\begin{center}
-\fbox{\rule{0pt}{2in} \rule{0.9\linewidth}{0pt}}
-   %\includegraphics[width=0.8\linewidth]{egfigure.eps}
-\end{center}
-   \caption{Example of caption.  It is set in Roman so that mathematics
-   (always set in Roman: $B \sin A = A \sin B$) may be included without an
-   ugly clash.}
-\label{fig:long}
-\label{fig:onecol}
-\end{figure}
 
 
-\begin{figure*}
-\begin{center}
-\fbox{\rule{0pt}{2in} \rule{.9\linewidth}{0pt}}
-\end{center}
-   \caption{Example of a short caption, which should be centered.}
-\label{fig:short}
-\end{figure*}
 
 %-------------------------------------------------------------------------
 \section*{Acknowledgements}
@@ -367,20 +374,7 @@ Supplementary material is not counted toward your 4-6 page limit and should be s
 \end{itemize}
 
 
-\begin{table}
-\begin{center}
-\begin{tabular}{|l|c|}
-\hline
-Method & Frobnability \\
-\hline\hline
-Theirs & Frumpy \\
-Yours & Frobbly \\
-Ours & Makes one's heart Frob\\
-\hline
-\end{tabular}
-\end{center}
-\caption{Results.   Ours is better.}
-\end{table}
+
 
 %-------------------------------------------------------------------------
 
