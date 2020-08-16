@@ -4,5 +4,5 @@
 #ignore all csv files
 *.csv
 
-#ignore ide folders
+#ignore ide and old weights folders
 .vscode/

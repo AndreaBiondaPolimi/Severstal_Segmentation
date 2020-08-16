@@ -282,3 +282,39 @@ def is_total_black(img, x, y, dx, dy, treshold=30, quantity=0):
     if (np.count_nonzero(cropped_img) > quantity):
         return False
     return True
+
+
+
+
+import configparser
+class Settings:
+    def __init__(self, path_ini, action, target):
+        self.config = configparser.ConfigParser()
+        self.config.read(path_ini)
+
+        if (target == 'segmentation'):
+            self.segmentation_model = self.config['SEGMENTATION_TRAINING']['model']
+            self.segmentation_activation = self.config['SEGMENTATION_TRAINING']['activation']
+            self.use_balanced_batch = bool(self.config.getboolean('SEGMENTATION_TRAINING','use_balanced_batch'))
+            self.loss = self.config['SEGMENTATION_TRAINING']['loss']
+            self.epochs = int(self.config['SEGMENTATION_TRAINING']['epochs'])
+            self.shape = list(eval(self.config['SEGMENTATION_TRAINING']['shape'])) 
+            self.segmentation_weights = self.config['SEGMENTATION_TRAINING']['pretrained_weights']
+            if (self.segmentation_weights == 'None'):
+                self.segmentation_weights = None
+            
+        elif (target == 'classification'):
+            self.classification_model = self.config['CLASSIFICATION_TRAINING']['model']
+            self.epochs = int(self.config['CLASSIFICATION_TRAINING']['epochs'])
+            self.classification_weights = self.config['CLASSIFICATION_TRAINING']['pretrained_weights']
+            if (self.classification_weights == 'None'):
+                self.classification_weights = None
+
+
+        if (action == 'test'):
+            self.segmentation_model = self.config['TEST']['segmentation_model']
+            self.classification_model = self.config['TEST']['classification_model']
+            self.segmentation_weights = self.config['TEST']['segmentation_weights']
+            self.classification_weights = self.config['TEST']['classification_weights']
+            self.segmentation_activation = self.config['TEST']['segmentation_activation']
+            self.verbose = bool(self.config.getboolean('TEST','verbose'))

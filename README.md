@@ -1,12 +1,9 @@
 # Severstal_Segmentation
 
-1. Code missings
-	1. Command line interface for utilization
-	2. Test train only on defective (segmentation)
+### To start the program you have to type the following command:
+*Main.py -a [Action] -t [Target] -f[Settings_file]*
 
+### Training and test parameters can be parametrized inside the settings file
 
-2. Important details for report
-	1. General structure (class + seg)
-	2. Model structure 
-	3. Sigmoid vs Softmax
-	4. Multiple random crop (balanced & avoid black crops)
+### Additional information can be found typing: 
+*Main.py -h*

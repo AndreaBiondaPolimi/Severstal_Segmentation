@@ -15,26 +15,20 @@ augmentation_parameters = {'flip_prob':0.5, 'shift_limit':0.1, 'rotate_limit':20
 
 
 import segmentation_models as sm
-def load_dataset_segmentation (preprocess_type, use_defective_only = False, activation='sigmoid'):
+def load_dataset_segmentation (preprocess_type, activation='sigmoid', use_balanced_dataset=True, shapes = ((5,256,384),(5,256,512))):
     np.random.seed(15)
 
     train2 = util.restructure_data_frame('Severstal_Dataset\\train.csv')
-    if (use_defective_only):
-        train2 = util.get_defective_data_frame(train2)
     train_idxs, valid_idxs = util.get_random_split(train2)
 
     preprocess = sm.get_preprocessing(preprocess_type)
-    preprocess = None
 
-    if (use_defective_only):
-        shapes = ((4,256,256),(4,256,384))
-    else:
-        shapes = ((5,256,384),(5,256,256))
+    #shapes = ((5,256,384),(5,256,512))
 
     train_batches =  SegmentationDataGenerator(train2.iloc[train_idxs], shapes=shapes, 
-                            shuffle=True, use_balanced_dataset=True, preprocess=preprocess, 
+                            shuffle=True, use_balanced_dataset=use_balanced_dataset, preprocess=preprocess, 
                             augmentation_parameters=augmentation_parameters, 
-                            use_defective_only=use_defective_only, activation=activation)
+                            use_defective_only=False, activation=activation)
 
     valid_batches = SegmentationDataGenerator(train2.iloc[valid_idxs], 
                                                 shuffle=True, preprocess=preprocess)
@@ -92,11 +86,8 @@ def load_dataset_classification (preprocess_type):
 
 
 
-
-
-
 from tqdm import tqdm
-def test_model(seg_model, cla_model, seg_preprocess_type, cls_preprocess_type, activation):
+def test_pipeline(seg_model, cla_model, seg_preprocess_type, cls_preprocess_type, activation, cls_treshold, verbose):
     train2 = util.restructure_data_frame('Severstal_Dataset\\test.csv')
     seg_preprocess = sm.get_preprocessing(seg_preprocess_type)
     cls_preprocess = sm.get_preprocessing(cls_preprocess_type)
@@ -122,7 +113,7 @@ def test_model(seg_model, cla_model, seg_preprocess_type, cls_preprocess_type, a
             cls_res = cla_model.predict(np.reshape(cls_x,(1,256,1600,3)))
 
             #If it is most probable defective, the result is a whole zero mask
-            if (cls_res < 0.5):
+            if (cls_res < cls_treshold):
                 res = np.zeros((256,1600,classes),dtype=np.uint8)
                 if classes == 5:
                     res[:,:,4] = 1
@@ -138,13 +129,14 @@ def test_model(seg_model, cla_model, seg_preprocess_type, cls_preprocess_type, a
             #Update dice value
             dice_res += dice_coef(mask.astype(np.uint8), res.astype(np.uint8))
             
-            coef = dice_coef(mask.astype(np.uint8), res.astype(np.uint8))
-            util.show_img_and_def((image, mask, res), ('orig','mask','pred ' + str(coef)))  
+            if (verbose):
+                coef = dice_coef(mask.astype(np.uint8), res.astype(np.uint8))
+                util.show_img_and_def((image, mask, res), ('orig','mask','pred ' + str(coef)))  
 
     print (dice_res/(n_samples*bs))
 
 acc_matrix = [0, 0, 0, 0]
-def fulltest_classification_model (cls_model, cls_preprocess_type):
+def test_classification (cls_model, cls_preprocess_type):
     train2 = util.restructure_data_frame('Severstal_Dataset\\test.csv')
     cls_preprocess = sm.get_preprocessing(cls_preprocess_type)
     bs = 2

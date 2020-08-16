@@ -9,28 +9,26 @@ from keras import backend as K
 from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
 from keras.losses import categorical_crossentropy
 
-def get_segmentation_model (input_size = (None, None, 3), pretrained_weights=None, preprocess_type = 'none', activation='sigmoid'):
-    if (preprocess_type == 'resnet34'):
-        return resent34_seg_model(input_size, pretrained_weights, activation)
-    elif (preprocess_type == 'efficientnetb3'):
-        return efficientnetb3_seg_model(input_size, pretrained_weights, activation)
+def get_segmentation_model (preprocess_type, input_size = (None, None, 3),  pretrained_weights=None, activation='sigmoid', loss='dice_bce'):
+    if (loss == 'dice_bce'):
+        loss_type = bce_dice_loss
+    elif (loss == 'categorical_crossentropy'):
+        loss_type = keras.losses.categorical_crossentropy
+    elif (loss == 'tversky'):
+        loss_type = tversky_loss
+    else:
+        raise "Loss type error"
+
+    return seg_model(preprocess_type, input_size, pretrained_weights, activation, loss_type)
         
 
 from segmentation_models import Unet
-from segmentation_models import FPN
-from segmentation_models.losses import bce_jaccard_loss
-import runai.ga
-def resent34_seg_model (input_size, pretrained_weights, activation):
+def seg_model (preprocess_type, input_size, pretrained_weights, activation, loss):
     classes = 4 if activation == 'sigmoid' else 5
     
-    model = Unet('resnet34', encoder_weights='imagenet', input_shape=input_size, classes=classes, activation=activation)
-    
-    #loss = 'binary_crossentropy'
-    loss = bce_dice_loss
-    #loss = bce_jaccard_loss
+    model = Unet(preprocess_type, encoder_weights='imagenet', input_shape=input_size, classes=classes, activation=activation)
 
-    adam = keras.optimizers.Adam(lr=1e-5)
-    #adam = runai.ga.keras.optimizers.Optimizer(adam, steps=3)
+    adam = keras.optimizers.Adam(lr=1e-4)
 
     model.compile(optimizer = adam, loss = loss , metrics=[dice_coef])
 
@@ -40,27 +38,6 @@ def resent34_seg_model (input_size, pretrained_weights, activation):
     	model.load_weights(pretrained_weights)
 
     return model
-
-
-def efficientnetb3_seg_model (input_size, pretrained_weights, activation):
-    classes = 4 if activation == 'sigmoid' else 5
-    
-    model = FPN('efficientnetb3', encoder_weights='imagenet', input_shape=input_size, classes=classes, activation=activation)
-
-    adam = keras.optimizers.Adam(lr=1e-5)
-    
-    model.compile(optimizer = adam, loss = bce_dice_loss , metrics=[dice_coef])
-    #model.compile(optimizer = adam, loss = bce_jaccard_loss , metrics=[dice_coef])
-    #model.compile(optimizer = adam, loss = categorical_crossentropy , metrics=[dice_coef])
-
-    model.summary()
-
-    if(pretrained_weights):
-    	model.load_weights(pretrained_weights)
-
-    return model
-
-
 
 
 
@@ -86,55 +63,6 @@ def train (model, train_dataset, valid_dataset, epochs):
     model.save('seg_final.h5')
 
 
-from tqdm import tqdm
-import segmentation_models as sm
-def search_segmentation_treshold (valid_batches, seg_model, activation, preprocess_type):
-    n_samples = valid_batches.__len__()
-    classes = 4 if activation == 'sigmoid' else 5
-    
-    defects = [0, 1, 2 ,3]
-    tresholds = [0.3, 0.4, 0.5 ,0.6, 0.7]
-
-    for defect in defects:
-        for treshold in tresholds:           
-            dice_res = 0
-            iterator = iter(valid_batches)
-            for _ in tqdm(range(n_samples)):
-                images, masks = next(iterator)
-
-                for i in range(len(images)):
-                    image = images[i].astype(np.int16)
-                    mask = masks[i]                 
-
-                    seg_preprocess = sm.get_preprocessing(preprocess_type)
-                    seg_x = seg_preprocess(image)   
-
-                    res = seg_model.predict(np.reshape(seg_x,(1,256,1600,3)))
-                    res = np.reshape(res,(256,1600,classes))
-                    tot  = np.zeros_like (res)
-
-                    mask_defect = res[:,:,defect]
-                    mask_defect[np.where(mask_defect < treshold)] = 0
-                    mask_defect[np.where(mask_defect >= treshold)] = 1
-
-                    tot [:,:,defect] = mask_defect
-
-                    res[np.where(res < 0.5)] = 0
-                    res[np.where(res >= 0.5)] = 1
-
-
-                    #Update dice value
-                    dice_res += dice_coef_test(mask.astype(np.uint8), tot.astype(np.uint8))
-                    
-                    coef = dice_coef_test(mask.astype(np.uint8), tot.astype(np.uint8))
-                    util.show_img_and_def((image, mask, tot), ('orig','mask','pred ' + str(coef)))
-
-            print()
-            print('Search for defect', defect, 'with treshold', treshold, 'dice', dice_res)
-
-
-
-
 
 def dice_coef(y_true, y_pred, smooth=1):  
     y_true_f = K.flatten(y_true[:,:,:,:4])
@@ -157,10 +85,14 @@ def bce_dice_loss(y_true, y_pred):
 
 
 
-def dice_coef_test(y_true, y_pred, smooth=1):  
-    y_true_f = y_true[:,:,:4].flatten()
-    y_pred_f = y_pred[:,:,:4].flatten()
-    intersection = np.sum(y_true_f * y_pred_f)
-    ret = (2 * intersection + smooth) / (np.sum(y_true_f) + np.sum(y_pred_f) + smooth)
-    return ret
+def tversky(y_true, y_pred, smooth=1):
+    y_true_pos = K.flatten(y_true)
+    y_pred_pos = K.flatten(y_pred)
+    true_pos = K.sum(y_true_pos * y_pred_pos)
+    false_neg = K.sum(y_true_pos * (1-y_pred_pos))
+    false_pos = K.sum((1-y_true_pos)*y_pred_pos)
+    alpha = 0.2
+    return (true_pos + smooth)/(true_pos + alpha*false_neg + (1-alpha)*false_pos + smooth)
 
+def tversky_loss(y_true, y_pred):
+    return 1 - tversky(y_true,y_pred)
