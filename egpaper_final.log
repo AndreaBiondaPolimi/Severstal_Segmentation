@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 20.6.29) (preloaded format=pdflatex 2020.7.21)  10 AUG 2020 17:09
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 20.6.29) (preloaded format=pdflatex 2020.7.21)  16 AUG 2020 11:47
 entering extended mode
 **c:/Users/Andrea/Desktop/Severstal_Segmentation/egpaper_final.tex
 (c:/Users/Andrea/Desktop/Severstal_Segmentation/egpaper_final.tex
@@ -629,29 +629,29 @@ File: l3backend-pdfmode.def 2020-06-29 L3 backend support: PDF mode
 ) (egpaper_final.aux)
 \openout1 = `egpaper_final.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 28.
-LaTeX Font Info:    ... okay on input line 28.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 28.
-LaTeX Font Info:    ... okay on input line 28.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 28.
-LaTeX Font Info:    ... okay on input line 28.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 28.
-LaTeX Font Info:    ... okay on input line 28.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 28.
-LaTeX Font Info:    ... okay on input line 28.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 28.
-LaTeX Font Info:    ... okay on input line 28.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 28.
-LaTeX Font Info:    ... okay on input line 28.
-LaTeX Font Info:    Checking defaults for LGR/cmr/m/n on input line 28.
-LaTeX Font Info:    Trying to load font information for LGR+cmr on input line 28.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 27.
+LaTeX Font Info:    ... okay on input line 27.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 27.
+LaTeX Font Info:    ... okay on input line 27.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 27.
+LaTeX Font Info:    ... okay on input line 27.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 27.
+LaTeX Font Info:    ... okay on input line 27.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 27.
+LaTeX Font Info:    ... okay on input line 27.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 27.
+LaTeX Font Info:    ... okay on input line 27.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 27.
+LaTeX Font Info:    ... okay on input line 27.
+LaTeX Font Info:    Checking defaults for LGR/cmr/m/n on input line 27.
+LaTeX Font Info:    Trying to load font information for LGR+cmr on input line 27.
  (C:\Users\Andrea\AppData\Local\Programs\MiKTeX\tex/latex/cbfonts-fd\lgrcmr.fd
 File: lgrcmr.fd 2017/07/29 v1.2 Greek European Computer Regular
 )
-LaTeX Font Info:    ... okay on input line 28.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 28.
-LaTeX Font Info:    ... okay on input line 28.
-LaTeX Font Info:    Trying to load font information for OT1+ptm on input line 28.
+LaTeX Font Info:    ... okay on input line 27.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 27.
+LaTeX Font Info:    ... okay on input line 27.
+LaTeX Font Info:    Trying to load font information for OT1+ptm on input line 27.
  (C:\Users\Andrea\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\ot1ptm.fd
 File: ot1ptm.fd 2001/06/04 font definitions for OT1/ptm.
 ) ABD: EveryShipout initializing macros (C:\Users\Andrea\AppData\Local\Programs\MiKTeX\tex/latex/graphics\color.sty
@@ -679,7 +679,7 @@ Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 48
 )
 \AtBeginShipoutBox=\box51
 Package atbegshi Info: Package `everyshi' patched.
-Package hyperref Info: Link coloring ON on input line 28.
+Package hyperref Info: Link coloring ON on input line 27.
  (C:\Users\Andrea\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\nameref.sty
 Package: nameref 2019/09/16 v2.46 Cross-referencing by name of section
  (C:\Users\Andrea\AppData\Local\Programs\MiKTeX\tex/latex/refcount\refcount.sty
@@ -689,144 +689,136 @@ Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
 )
 \c@section@level=\count281
 )
-LaTeX Info: Redefining \ref on input line 28.
-LaTeX Info: Redefining \pageref on input line 28.
-LaTeX Info: Redefining \nameref on input line 28.
-LaTeX Font Info:    Trying to load font information for U+msa on input line 39.
+LaTeX Info: Redefining \ref on input line 27.
+LaTeX Info: Redefining \pageref on input line 27.
+LaTeX Info: Redefining \nameref on input line 27.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 38.
  (C:\Users\Andrea\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 39.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 38.
  (C:\Users\Andrea\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-LaTeX Font Info:    Trying to load font information for OT1+pcr on input line 39.
+LaTeX Font Info:    Trying to load font information for OT1+pcr on input line 38.
  (C:\Users\Andrea\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\ot1pcr.fd
 File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
 )
-LaTeX Font Info:    Trying to load font information for TS1+ptm on input line 70.
- (C:\Users\Andrea\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\ts1ptm.fd
+<./Resources/Img_Defect1.png, id=8, 797.22844pt x 127.97812pt>
+File: ./Resources/Img_Defect1.png Graphic file (type png)
+<use ./Resources/Img_Defect1.png>
+Package pdftex.def Info: ./Resources/Img_Defect1.png  used on input line 65.
+(pdftex.def)             Requested size: 239.17038pt x 38.39372pt.
+
+Overfull \hbox (2.03444pt too wide) in paragraph at lines 65--66
+ [][] 
+ []
+
+<./Resources/Img_Defect2.png, id=9, 797.98125pt x 127.97812pt>
+File: ./Resources/Img_Defect2.png Graphic file (type png)
+<use ./Resources/Img_Defect2.png>
+Package pdftex.def Info: ./Resources/Img_Defect2.png  used on input line 67.
+(pdftex.def)             Requested size: 239.39621pt x 38.39372pt.
+
+Overfull \hbox (2.26027pt too wide) in paragraph at lines 67--68
+ [][] 
+ []
+
+<./Resources/Img_Defect3.png, id=10, 797.98125pt x 127.22531pt>
+File: ./Resources/Img_Defect3.png Graphic file (type png)
+<use ./Resources/Img_Defect3.png>
+Package pdftex.def Info: ./Resources/Img_Defect3.png  used on input line 69.
+(pdftex.def)             Requested size: 239.39621pt x 38.16788pt.
+
+Overfull \hbox (2.26027pt too wide) in paragraph at lines 69--70
+ [][] 
+ []
+
+<./Resources/Img_Defect4.png, id=11, 797.98125pt x 128.73094pt>
+File: ./Resources/Img_Defect4.png Graphic file (type png)
+<use ./Resources/Img_Defect4.png>
+Package pdftex.def Info: ./Resources/Img_Defect4.png  used on input line 71.
+(pdftex.def)             Requested size: 239.39621pt x 38.61957pt.
+
+Overfull \hbox (2.26027pt too wide) in paragraph at lines 71--72
+ [][] 
+ []
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+LaTeX Font Info:    Trying to load font information for TS1+ptm on input line 86.
+(C:\Users\Andrea\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\ts1ptm.fd
 File: ts1ptm.fd 2001/06/04 font definitions for TS1/ptm.
-) [1{C:/Users/Andrea/AppData/Local/MiKTeX/pdftex/config/pdftex.map}
+)
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [1{C:/Users/Andrea/AppData/Local/MiKTeX/pdftex/config/pdftex.map}
 
 
 ]
 
-LaTeX Warning: Citation `steinhardt' on page 2 undefined on input line 97.
+LaTeX Warning: Citation `steinhardt' on page 2 undefined on input line 114.
 
 
-LaTeX Warning: Citation `lipton' on page 2 undefined on input line 97.
+LaTeX Warning: Citation `lipton' on page 2 undefined on input line 114.
 
 
-LaTeX Warning: Citation `twit:ref' on page 2 undefined on input line 97.
-
-<./Resources/Img_Defect1.png, id=21, 797.22844pt x 127.97812pt>
-File: ./Resources/Img_Defect1.png Graphic file (type png)
-<use ./Resources/Img_Defect1.png>
-Package pdftex.def Info: ./Resources/Img_Defect1.png  used on input line 110.
-(pdftex.def)             Requested size: 239.17038pt x 38.39372pt.
-
-Overfull \hbox (2.03444pt too wide) in paragraph at lines 110--111
- [][] 
- []
-
-<./Resources/Img_Defect2.png, id=22, 797.98125pt x 127.97812pt>
-File: ./Resources/Img_Defect2.png Graphic file (type png)
-<use ./Resources/Img_Defect2.png>
-Package pdftex.def Info: ./Resources/Img_Defect2.png  used on input line 112.
-(pdftex.def)             Requested size: 239.39621pt x 38.39372pt.
-
-Overfull \hbox (2.26027pt too wide) in paragraph at lines 112--113
- [][] 
- []
-
-<./Resources/Img_Defect3.png, id=23, 797.98125pt x 127.22531pt>
-File: ./Resources/Img_Defect3.png Graphic file (type png)
-<use ./Resources/Img_Defect3.png>
-Package pdftex.def Info: ./Resources/Img_Defect3.png  used on input line 114.
-(pdftex.def)             Requested size: 239.39621pt x 38.16788pt.
-
-Overfull \hbox (2.26027pt too wide) in paragraph at lines 114--115
- [][] 
- []
-
-<./Resources/Img_Defect4.png, id=24, 797.98125pt x 128.73094pt>
-File: ./Resources/Img_Defect4.png Graphic file (type png)
-<use ./Resources/Img_Defect4.png>
-Package pdftex.def Info: ./Resources/Img_Defect4.png  used on input line 116.
-(pdftex.def)             Requested size: 239.39621pt x 38.61957pt.
-
-Overfull \hbox (2.26027pt too wide) in paragraph at lines 116--117
- [][] 
- []
-
-
-Underfull \hbox (badness 1565) in paragraph at lines 119--120
-\OT1/ptm/m/n/10 de-fec-tive (56%) and non-defective im-ages (44%), but
- []
+LaTeX Warning: Citation `twit:ref' on page 2 undefined on input line 114.
 
 [2 <./Resources/Img_Defect1.png> <./Resources/Img_Defect2.png> <./Resources/Img_Defect3.png> <./Resources/Img_Defect4.png>]
-<./Resources/Img_ClassImbalance.png, id=46, 552.56438pt x 107.65219pt>
-File: ./Resources/Img_ClassImbalance.png Graphic file (type png)
-<use ./Resources/Img_ClassImbalance.png>
-Package pdftex.def Info: ./Resources/Img_ClassImbalance.png  used on input line 124.
-(pdftex.def)             Requested size: 248.65166pt x 48.44302pt.
-
-Overfull \hbox (11.51572pt too wide) in paragraph at lines 124--125
- [][] 
- []
-
-<./Resources/Img_FirstApproach.png, id=49, 457.71pt x 100.87688pt>
+<./Resources/Img_FirstApproach.png, id=45, 457.71pt x 100.87688pt>
 File: ./Resources/Img_FirstApproach.png Graphic file (type png)
 <use ./Resources/Img_FirstApproach.png>
-Package pdftex.def Info: ./Resources/Img_FirstApproach.png  used on input line 139.
+Package pdftex.def Info: ./Resources/Img_FirstApproach.png  used on input line 127.
 (pdftex.def)             Requested size: 251.74129pt x 55.48244pt.
 
-Overfull \hbox (14.60535pt too wide) in paragraph at lines 139--140
+Overfull \hbox (14.60535pt too wide) in paragraph at lines 127--128
  [][] 
  []
 
-<./Resources/Img_SecondApproach.png, id=55, 508.90125pt x 217.5628pt>
+<./Resources/Img_SecondApproach.png, id=51, 508.90125pt x 217.5628pt>
 File: ./Resources/Img_SecondApproach.png Graphic file (type png)
 <use ./Resources/Img_SecondApproach.png>
-Package pdftex.def Info: ./Resources/Img_SecondApproach.png  used on input line 148.
+Package pdftex.def Info: ./Resources/Img_SecondApproach.png  used on input line 136.
 (pdftex.def)             Requested size: 244.26982pt x 104.42896pt.
 
-Overfull \hbox (7.13388pt too wide) in paragraph at lines 148--149
+Overfull \hbox (7.13388pt too wide) in paragraph at lines 136--137
 [][] 
  []
 
+[3 <./Resources/Img_FirstApproach.png> <./Resources/Img_SecondApproach.png>]
+
+LaTeX Warning: Citation `Authors14' on page 4 undefined on input line 183.
+
+<./Resources/Img_ClassImbalance.png, id=76, 552.56438pt x 107.65219pt>
+File: ./Resources/Img_ClassImbalance.png Graphic file (type png)
+<use ./Resources/Img_ClassImbalance.png>
+Package pdftex.def Info: ./Resources/Img_ClassImbalance.png  used on input line 201.
+(pdftex.def)             Requested size: 248.65166pt x 48.44302pt.
+
+Overfull \hbox (11.51572pt too wide) in paragraph at lines 201--202
+ [][] 
+ []
+
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-[3 <./Resources/Img_ClassImbalance.png> <./Resources/Img_FirstApproach.png> <./Resources/Img_SecondApproach.png>]
-
-LaTeX Warning: Citation `Authors14' on page 4 undefined on input line 195.
-
-LaTeX Font Info:    Trying to load font information for U+eur on input line 216.
+LaTeX Font Info:    Trying to load font information for U+eur on input line 214.
 (C:\Users\Andrea\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\ueur.fd
 File: ueur.fd 2013/01/14 v3.01 Euler Roman
 )
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-<./Resources/Img_Result1.png, id=85, 474.27188pt x 76.03406pt>
+<./Resources/Img_Result1.png, id=83, 474.27188pt x 76.03406pt>
 File: ./Resources/Img_Result1.png Graphic file (type png)
 <use ./Resources/Img_Result1.png>
-Package pdftex.def Info: ./Resources/Img_Result1.png  used on input line 251.
+Package pdftex.def Info: ./Resources/Img_Result1.png  used on input line 249.
 (pdftex.def)             Requested size: 237.13536pt x 38.01692pt.
-<./Resources/Img_Result2.png, id=87, 667.74469pt x 108.405pt>
+<./Resources/Img_Result2.png, id=85, 667.74469pt x 108.405pt>
 File: ./Resources/Img_Result2.png Graphic file (type png)
 <use ./Resources/Img_Result2.png>
-Package pdftex.def Info: ./Resources/Img_Result2.png  used on input line 257.
+Package pdftex.def Info: ./Resources/Img_Result2.png  used on input line 255.
 (pdftex.def)             Requested size: 237.04593pt x 38.4832pt.
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-[4] [5 <./Resources/Img_Result1.png> <./Resources/Img_Result2.png>] (egpaper_final.bbl (egpaper_final.brf)
+ [4 <./Resources/Img_ClassImbalance.png>] [5 <./Resources/Img_Result1.png> <./Resources/Img_Result2.png>] (egpaper_final.bbl (egpaper_final.brf)
 \tf@brf=\write3
 \openout3 = `egpaper_final.brf'.
 
@@ -836,34 +828,34 @@ Underfull \hbox (badness 2443) in paragraph at lines 15--15
  []
 
 )
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 388.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 386.
  [6
 
 ]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 388.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 386.
  (egpaper_final.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 388.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 388.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 386.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 386.
 Package rerunfilecheck Info: File `egpaper_final.brf' has not changed.
-(rerunfilecheck)             Checksum: 653164E61FA96689C4A151B8D945DB09;467.
+(rerunfilecheck)             Checksum: 647517AB475B20B7AF492F47CA1AEB0E;474.
 
 
 LaTeX Warning: There were undefined references.
 
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 388.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 386.
  ) 
 Here is how much of TeX's memory you used:
  8258 strings out of 481225
- 127358 string characters out of 2905705
- 386067 words of memory out of 3000000
+ 127363 string characters out of 2905705
+ 383067 words of memory out of 3000000
  23582 multiletter control sequences out of 15000+200000
  562151 words of font info for 85 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
- 56i,15n,45p,938b,376s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 56i,15n,45p,938b,391s stack positions out of 5000i,500n,10000p,200000b,50000s
 {C:/Users/Andrea/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/base/8r.enc}<C:/Users/Andrea/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Users/Andrea/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi7.pfb><C:/Users/Andrea/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/Andrea/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr7.pfb><C:/Users/Andrea/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/Andrea/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy7.pfb><C:/Users/Andrea/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/euler/eurm10.pfb><C:/Users/Andrea/AppData/Local/Programs/MiKTeX/fonts/type1/urw/courier/ucrr8a.pfb><C:/Users/Andrea/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmb8a.pfb><C:/Users/Andrea/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmr8a.pfb><C:/Users/Andrea/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmri8a.pfb>
-Output written on egpaper_final.pdf (6 pages, 1020523 bytes).
+Output written on egpaper_final.pdf (6 pages, 1020769 bytes).
 PDF statistics:
- 191 PDF objects out of 1000 (max. 8388607)
+ 192 PDF objects out of 1000 (max. 8388607)
  62 named destinations out of 1000 (max. 500000)
  46 words of extra memory for PDF output out of 10000 (max. 10000000)
 

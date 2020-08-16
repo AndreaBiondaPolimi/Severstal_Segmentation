@@ -22,13 +22,12 @@
 
 \def\cvprPaperID{****} % *** Enter the CVPR Paper ID here
 \def\httilde{\mbox{\tt\raisebox{-.5ex}{\symbol{126}}}}
-
 % Pages are numbered in submission mode, and unnumbered in camera-ready
 \ifcvprfinal\pagestyle{empty}\fi
 \begin{document}
 
 %%%%%%%%% TITLE
-\title{Severstal defect segmentation \\ IACV 2019-2020 Project} 
+\title{Severstal steel defect segmentation \\ IACV 2019-2020 Project} 
 
 \author{Andrea Bionda\\
 Politecnico di Milano\\
@@ -39,11 +38,11 @@ Politecnico di Milano\\
 
 %%%%%%%%% ABSTRACT
 \begin{abstract}
-   Steel is one of the most important building materials of modern times. It was observed that the future of metallurgy requires the development of even more technological tools to face contemporary economic, ecological, and social challenges. 
-   In order to increase efficiency in production, Severstal collected gigabytes of data looking for a deep learning approach that helps them in recognizing and classifying automatically surface defects on steel sheets.
-   The goal of this challenge is not only to provide a good segmentation and classification of defects, but also an accurate classification between defective and non-defective images, in order to reduce false positives, and so waste of money and resources.
-   In this paper, I will try to give a solution to the above problem, using a combination of two famous deep learning tools, named classification and segmentation respectively.
-   The evaluation metrics used in this competition is the so called Dice coefficient, which is not only an accuracy index, but it also penalizes the false positives that the method finds, more similar to precision. (170)
+   It has been observed that the future of metallurgy requires the development of even more technological tools to face contemporary economic, ecological, and social challenges.
+   The purpose of this paper is to provide a deep learning approach for the segmentation and classification of defects on steel sheets.\\
+   The proposed solution is built focusing on two expected results: a precise defect segmentation and labelling, and an accurate classification between defective and non-defective images, in order to reduce false positives, and so waste of money and resources.\\
+   I will try to solve the above problem, using a combination of two famous deep learning approaches, named image classification and semantic segmentation respectively.
+   The evaluation metrics is the so called Dice coefficient, which is not only an accuracy index, but it also penalizes the false positives that the method finds, more similar to precision.
 
    \textcolor{blue}{
    The abstract should be self contained and explain what the paper is about. Usually abstracts are no longer than 300 words. You should state what are the main contributions of your work and tempt the reader to continue to read your paper. A good abstract briefly describes your problem, approach, and key results. This document is based on the CVPR submission template, and it has been adapted to submit a technical report of a project of the Deep Learning and Image Classification course.}
@@ -51,11 +50,28 @@ Politecnico di Milano\\
 
 %%%%%%%%% INTRODUCTION
 %------------------------------------------------------------------------
+\graphicspath{ {./Resources/} }
 \section{Introduction}
-   The main contribution of this paper is to present a method to solve the above problem, that provides a good tradeoff between accuracy on defect segmentation and precision in defective-image identification. \\
-   The proposed solution takes in input images of steel sheet that come from high-frequency cameras and output the same-size segmented images, which contain the area of the defect(s) identified (if any) and the corresponding type. \\
+   In order to increase efficiency in production, Severstal collected gigabytes of data looking for a deep learning approach that helps them in the problem of recognize and classify automatically surface defects on steel sheets. The semantic segmentation aims to provide a label for each pixel in the image, in relation to this problem means assign one of the four defective class or the non-defective one to each pixel.\\
+   The main contribution of this paper is to present a method that provides a good tradeoff between accuracy on defect segmentation and precision in defective-image identification. The proposed solution takes in input images of steel sheet that come from high-frequency cameras and output the same-size segmented images, which contain the area of the defect(s) identified (if any) and the corresponding type. \\
    The first explored approach is to use a single Fully Convolutional Neural Network that performs semantic segmentation over the four defects; in particular I have used the U-Net architecture. This method gives a Dice coefficient of 0.48 in the test set.
-   In order to improve the precision, and so reducing false positives, the second and final approach is a pipeline of two different techniques: in the first stage, there is a Binary Classifier that is trained to filter out defect-free images; in the second stage, it is placed the segmentation model presented in the first method, that will segment only images that are labelled defective by the Classifier. This second approach gives a Dice coefficient of 0.71 in the test set. 
+   In order to improve precision, and so reducing false positives, the second approach is a pipeline of two different techniques: in the first stage, there is a Binary Classifier that is trained to filter out defect-free images; in the second stage, it is placed the segmentation model presented in the first method, that will segment only images that are labelled defective by the Classifier. This second approach gives a Dice coefficient of 0.71 in the test set.\\ 
+   The rational behind the pipeline is to let the U-Net not worry about the possibility of identify false defects, that usually have a very similar pattern of real defects (Figure \ref{fig:result2}), in order to not reduce too much its segmentation ability; then training a classification model with the objective of find and filter out non-defective images.\\
+   The images come from real camera shot of steel sheets and can present 4 types of defects classified in: Pitting (Figure \ref{fig:defect1}), Inclusion (Figure \ref{fig:defect2}), Scratches (Figure \ref{fig:defect3}) and Corrosion (Figure \ref{fig:defect4}).
+   
+   \begin{figure}[h]
+      \centering
+      \caption{Pitting} \label{fig:defect1}
+      \includegraphics[scale=0.3]{Img_Defect1}
+      \caption{Inclusion} \label{fig:defect2}
+      \includegraphics[scale=0.3]{Img_Defect2}
+      \caption{Scratches} \label{fig:defect3}
+      \includegraphics[scale=0.3]{Img_Defect3}
+      \caption{Corrosion} \label{fig:defect4}
+      \includegraphics[scale=0.3]{Img_Defect4}
+   \end{figure}
+
+
 
 
    \textcolor{blue}{
@@ -84,13 +100,14 @@ Politecnico di Milano\\
 %------------------------------------------------------------------------
 \section{Related work}
    Since the output of the problem is a pixel-wise label for the input image, it is essentially a semantic segmentation task. In our case, it is also used a binary classifier to refine the results.
-   \subsection{U-Net}
-      The baseline architecture used in the segmentation phase is the so called U-Net, that is composed of two concatenated parts: the contracting path (or down-sampling network or encoder network) works as a classical Fully Convolutional Neural Network (FCNN) to extract meaningful feature from the image, while the expansive path (or up-sampling network or decoder network) builds a high resolution output starting from the feature extracted during the first phase. The biggest contribution taken by this architecture is that each up-sampling layer is enriched with features information extracted in the corresponding downsampling layer network, in order to achieve higher semantic levels \cite{Unet}. 
    \subsection{Residual Networks} 
       This family of Convolutional Neural Network is built to face the degradation problem of very deep networks. The related paper proposes that such degradation is not caused by overfitting, but instead it is due to the well-known vanishing gradient issue. The main idea is to add an identity shortcut connection between blocks (group of convolutional layers), in such a way that each one learns features from both previous block and input value \cite{resnet}.
       In this paper, I will refer to ResNet34 and ResNet50, two models of the same family, but with different number of layers.
    \subsection{EfficientNet}
       The idea behind this family of Convolutional Neural Network is to scale a baseline model, called EfficientNet-B0, in width, depth, and resolution by a costant ratio, in order to obtain higher accuracy. This process allows to keep the number of parameters lower than the one in same accuracy-level models \cite{efficientnet}. In the proposed solution, I will refer to EfficientNet-B3, a good tradeoff between accuracy level and network size.
+   \subsection{U-Net}
+      The baseline architecture used in the segmentation phase is the so called U-Net, that is composed of two concatenated parts: the contracting path (or down-sampling network or encoder network) works as a classical Fully Convolutional Neural Network (FCNN) to extract meaningful feature from the image, while the expansive path (or up-sampling network or decoder network) builds a high resolution output starting from the feature extracted during the first phase. The biggest contribution taken by this architecture is that each up-sampling layer is enriched with features information extracted in the corresponding downsampling layer network, in order to achieve higher semantic levels \cite{Unet}. 
+   
 
 \textcolor{blue}{
 In this section you should discuss published work that relates to your project. This is expected to be full of references, meaning that you have read the existing literature and you know what you are working on very well. This is not just a list or works, but you are not supposed to cluster papers that use similar approaches and compare them each other using very short sentences. I strongly suggest to check \cite{steinhardt, lipton} blog posts for some good practices in writing a paper. A quote that I like very much is \emph{``Research is spending 6 hours reading 35 papers, so you can write one sentence containing 2 references''} \cite{twit:ref}. Keep it in mind while you are writing!
@@ -98,36 +115,7 @@ In this section you should discuss published work that relates to your project. 
 
 
 
-%%%%%%%%% RELATED WORK
-%------------------------------------------------------------------------
-\graphicspath{ {./Resources/} }
-\section{Dataset analysis}
-   The first, and one of the most important phases of every Machine Learning task, is the analysis of input data. In this problem, we have 12568 greyscale images of size 1600x256x3, that come from real camera shot of steel sheets and a data file (.csv), that contains all the information in order to generate each defective mask. This dataset is obtained from the corresponding Kaggle competition \cite{Severstal}.The types of defects can be classified in Pitting (Figure \ref{fig:defect1}), Inclusion (Figure \ref{fig:defect2}), Scratches (Figure \ref{fig:defect3}) and Corrosion (Figure \ref{fig:defect4}).
-
-   \begin{figure}[h]
-      \centering
-      \caption{Pitting} \label{fig:defect1}
-      \includegraphics[scale=0.3]{Img_Defect1}
-      \caption{Inclusion} \label{fig:defect2}
-      \includegraphics[scale=0.3]{Img_Defect2}
-      \caption{Scratches} \label{fig:defect3}
-      \includegraphics[scale=0.3]{Img_Defect3}
-      \caption{Corrosion} \label{fig:defect4}
-      \includegraphics[scale=0.3]{Img_Defect4}
-   \end{figure}
-
-   The dataset exhibits a fairly even distribution between defective (56\%) and non-defective images (44\%), but among the defective ones we can notice a strong imbalance between defect classes (Figure \ref{fig:classImbalance}). This distribution can lead to recognize only one type of defect (the third one), since it represents the largest part of the defective images. During the discussion of the proposed approach, I will explain a solution to this problem.
-
-   \begin{figure}[h]
-      \centering
-      \caption{Defect class distribution} \label{fig:classImbalance}
-      \includegraphics[scale=0.45]{Img_ClassImbalance}
-   \end{figure}
-
-
-
-
-
+%%%%%%%%% Proposed APPROACH
 %------------------------------------------------------------------------
 \section{Proposed approach}
    The first and straightforward solution that I have applied to the problem is to build a U-Net architecture for semantic segmentation in such a way that it outputs same-size images with 4 channels, one for each defect class (Figure \ref{fig:firstApproach}).  
@@ -203,6 +191,16 @@ zoom in to see tiny details on a graphic.}
    \begin{equation}\label{eq:dice_loss}
       L_{dice} = \frac{2 * y_{pred} * y_{true}}{y_{pred} + y_{true}}
    \end{equation}
+
+   \subsection{Dataset analysis}
+   The dataset is obtained from the corresponding Kaggle competition \cite{Severstal}, it is composed of 12568 greyscale images of size 1600x256x3 and their corresponding defective masks.
+   The dataset exhibits a fairly even distribution between defective (56\%) and non-defective images (44\%), but among the defective ones we can notice a strong imbalance between defect classes (Figure \ref{fig:classImbalance}). This distribution can lead to recognize only one type of defect (the third one), since it represents the largest part of the defective images.
+   \begin{figure}[h]
+      \centering
+      \caption{Defect class distribution} \label{fig:classImbalance}
+      \includegraphics[scale=0.45]{Img_ClassImbalance}
+   \end{figure}
+
    \subsection{Segmentation}
       \paragraph{Data preparation}
          The first operation applied is to crop the images due to the large dimension of the input data and the corresponding limited amount of memory. Thanks to the idea behind Fully Convolutional Neural Network, it is possible to train and predict on different image dimension with good output resolution \cite{FCNN}.

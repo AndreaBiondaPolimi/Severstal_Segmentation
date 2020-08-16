@@ -1,10 +1,10 @@
-\backcite {Unet}{{2}{2.1}{subsection.2.1}}
-\backcite {resnet}{{2}{2.2}{subsection.2.2}}
-\backcite {efficientnet}{{2}{2.3}{subsection.2.3}}
+\backcite {resnet}{{2}{2.1}{subsection.2.1}}
+\backcite {efficientnet}{{2}{2.2}{subsection.2.2}}
+\backcite {Unet}{{2}{2.3}{subsection.2.3}}
 \backcite {steinhardt, lipton}{{2}{2.3}{subsection.2.3}}
 \backcite {twit:ref}{{2}{2.3}{subsection.2.3}}
-\backcite {Severstal}{{2}{3}{section.3}}
-\backcite {efficientnet}{{3}{4.1}{subsection.4.1}}
-\backcite {resnet}{{3}{4.2}{subsection.4.2}}
-\backcite {Authors14}{{4}{4.5}{subsection.4.5}}
-\backcite {FCNN}{{4}{5.1}{section*.1}}
+\backcite {efficientnet}{{3}{3.1}{subsection.3.1}}
+\backcite {resnet}{{3}{3.2}{subsection.3.2}}
+\backcite {Authors14}{{4}{3.5}{subsection.3.5}}
+\backcite {Severstal}{{4}{4.1}{subsection.4.1}}
+\backcite {FCNN}{{4}{4.2}{section*.1}}
