@@ -56,7 +56,7 @@ Politecnico di Milano\\
    The main contribution of this paper is to present a method that provides a good tradeoff between accuracy on defect segmentation and precision in defective-image identification. The proposed solution takes in input images of steel sheet that come from high-frequency cameras and output the same-size segmented images, which contain the area of the defect(s) identified (if any) and the corresponding type. \\
    The first explored approach is to use a single Fully Convolutional Neural Network that performs semantic segmentation over the four defects; in particular I have used the U-Net architecture. This method gives a Dice coefficient of 0.48 in the test set.
    In order to improve precision, and so reducing false positives, the second approach is a pipeline of two different techniques: in the first stage, there is a Binary Classifier that is trained to filter out defect-free images; in the second stage, it is placed the segmentation model presented in the first method, that will segment only images that are labelled defective by the Classifier. This second approach gives a Dice coefficient of 0.71 in the test set.\\ 
-   The rational behind the pipeline is to let the U-Net not worry about the possibility of identify false defects, that usually have a very similar pattern of real defects (Figure \ref{fig:result2}), in order to not reduce too much its segmentation ability; then training a classification model with the objective of find and filter out non-defective images.\\
+   The rationale behind the pipeline is to let the U-Net not worry about the possibility of identify false defects, that usually have a very similar pattern of real defects (Figure \ref{fig:result2}), in order to not reduce too much its segmentation ability; then training a classification model with the objective of find and filter out non-defective images.\\
    The images come from real camera shot of steel sheets and can present 4 types of defects classified in: Pitting (Figure \ref{fig:defect1}), Inclusion (Figure \ref{fig:defect2}), Scratches (Figure \ref{fig:defect3}) and Corrosion (Figure \ref{fig:defect4}).
    
    \begin{figure}[h]
@@ -128,7 +128,7 @@ In this section you should discuss published work that relates to your project. 
    \end{figure}
 
    This method has a very good capibility in defect recognition, but at the same time it hardly distinguishes real defects from the false ones, due to their similar pattern (an example on Figure \ref{fig:result1} and \ref{fig:result2}). This problem is highly penalized in the case in which no defects are present with Dice metric \eqref{eq:dice_loss}, that could be reasonable in high capacity foundries, where the goal is also to reduce at minimum the false scrap and so the waste of resources (if the machine labels part of the steel sheet as defective, it will be thrown away).\\
-   For this reason, the second and real proposed approach is to train a Binary classifier for the purpose of distinguishing defective from non-defective images. The idea is to use the classifier to decide, during inference time, whether an image could contain a defect or not and, if the answer is true, to pass it to the U-Net to segment the defect, otherwise the segmentation inference is skipped and whole-zero masks are generated as heatmaps (Figure \ref{fig:secondApproach}).\\
+   For this reason, the second proposed approach is to train a Binary classifier with the goal of distinguishing defective from non-defective images. The idea is to use the classifier to decide, during inference time, whether an image could contain a defect or not and, if the answer is true, to pass it to the U-Net to segment the defect, otherwise the segmentation inference is skipped and whole-zero masks are generated as heatmaps (Figure \ref{fig:secondApproach}).\\
    This pipeline will reduce the false scrap and increase Dice coefficient, as it is presented in the result section (Table \ref{table:res_finals}.).
     
    \begin{figure}[h]
@@ -204,14 +204,14 @@ zoom in to see tiny details on a graphic.}
    \subsection{Segmentation}
       \paragraph{Data preparation}
          The first operation applied is to crop the images due to the large dimension of the input data and the corresponding limited amount of memory. Thanks to the idea behind Fully Convolutional Neural Network, it is possible to train and predict on different image dimension with good output resolution \cite{FCNN}.
-         In order to apply a first level of data augmentation, the crop size varies on different epochs, also completely dark crops are prevented since does not bring any useful information. ??
+         In order to apply a first level of data augmentation, the crop size varies on different epochs, also completely dark crops are prevented since does not bring any useful information.
          In order to face imbalanced dataset issue, the batch is composed of all images' classes in equal proportion (included non-defective class).
 
       \paragraph{Training parameters}
          \begin{itemize}
             \item Data augmentation is applied with both random spatial transformations (flip, rotation and shifting) and color augmentation (brightness and contrast).
             \item The crop size used are (5, 256, 384) and (5, 256, 512) that will interchange on epochs, where the first number in the tuple identifies the batch size.
-            \item The loss function varies during the training: the first 70 epochs were trained using a balanced combination of two loss functions, Binary Cross Entropy and Dice \eqref{eq:dice_loss} that provides a tradeoff between accuracy and precision \eqref{eq:loss_bce_dice}. Finally the model is fine tuned for other 40 epochs using Tversky loss \eqref{eq:loss_tversky} with \textalpha=0.3 to reduce the false positive rate. 
+            \item The loss function varies during the training: the first 70 epochs were trained using a balanced combination of two loss functions, Binary Cross Entropy and Dice \eqref{eq:dice_loss} that provides a tradeoff between accuracy and precision \eqref{eq:loss_bce_dice}. Finally the model is fine tuned for other 40 epochs using Tversky loss \eqref{eq:loss_tversky} with \textalpha=0.3 to reduce the false positive rate. In the cass of softmax activation function, the loss used is Categorical Cross Entropy working on channel axis.
             \begin{equation}\label{eq:loss_bce_dice}
                L_{bce\_dice} = L_{dice} + L_{bce}
             \end{equation}
@@ -222,16 +222,16 @@ zoom in to see tiny details on a graphic.}
          \end{itemize}
 
       \paragraph{Experimental results and observations}
-         The followig results refer to tests on the segmentation model only.
+         The followig results refer to tests on the segmentation model only (Table \ref{table:res_encoders}).
          \begin{table}[h]
             \centering
             \begin{tabular}{||c c c||} 
             \hline
             Encoder model & Activation function & Dice metric\\ [0.4ex] 
             \hline\hline
-            ResNet34 & Sigmoid & XXX \\ 
+            ResNet34 & Sigmoid & 0.469 \\ 
             \hline
-            ResNet50 & Sigmoid & XXX \\
+            ResNet50 & Sigmoid & 0.602 \\
             \hline
             \textbf{EfficientNet-B3} & \textbf{Sigmoid} & \textbf{0.607} \\
             \hline
@@ -257,7 +257,7 @@ zoom in to see tiny details on a graphic.}
    
    \subsection{Classification}
       \paragraph{Data preparation} 
-         For classification I did not apply any data preprocessing.
+         For classification, no data preprocessing is applied.
                  
       \paragraph{Training parameters}
       \begin{itemize}
@@ -305,7 +305,7 @@ zoom in to see tiny details on a graphic.}
             
    \subsection{Compelte pipeline}
       The training procedure of the entire pipeline is simply composed of the two procedures stated above.
-      The following refers to the results coming from the two approaches, using EfficientNet-B3 as encoder model in the segmentation phase, and ResNet50 as binary classifier. 
+      The following refers to the results coming from the two approaches, using EfficientNet-B3 as encoder model of the U-Net in the segmentation phase, and ResNet50 as binary classifier. 
       \begin{table}[h]
          \centering
          \begin{tabular}{||c c||} 
@@ -336,10 +336,10 @@ Discuss your results and compare with other methods. You can also perform an \em
 
 %-----------------------------------------------------------------------
 \section{Conclusion} 
-This project leverages the semantic segmentation and classification echniques to solve the steel defect detection problem. From the experiments arised that the combination of these two techniques works particularly weel as a tradeoff between accuracy and precision, in this particualar field.\\
+This project leverages the semantic segmentation and classification techniques to solve the steel defect detection problem. From the experiments arises that the combination of these two techniques works particularly well as a tradeoff between accuracy and precision, in this particualar field.\\
 Possible future improvements could be:
 \begin{itemize}
-   \item Try ensamble learning in order to exploit different encoder models in the final result.
+   \item Try ensamble learning in order to exploit different encoder models' capability.
    \item Fitht imabalanced dataset issue using a custom loss that takes in consideration the defect class distribution.
 \end{itemize}
 
