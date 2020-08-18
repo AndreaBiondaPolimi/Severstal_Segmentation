@@ -7,52 +7,47 @@ Reallocating 'name_of_file' (item size: 1) to 6 items.
 Database file #1: egbib.bib
 Warning--I'm ignoring Severstal's extra "note" field
 --line 31 of file egbib.bib
-Warning--I didn't find a database entry for "steinhardt"
-Warning--I didn't find a database entry for "lipton"
-Warning--I didn't find a database entry for "twit:ref"
-Warning--I didn't find a database entry for "Authors14"
 Warning--to sort, need author or key in Severstal
-Warning--empty title in FCNN
 Warning--empty journal in FCNN
-You've used 5 entries,
+You've used 6 entries,
             2120 wiz_defined-function locations,
-            526 strings with 4505 characters,
-and the built_in function-call counts, 1027 in all, are:
-= -- 90
-> -- 35
+            526 strings with 4613 characters,
+and the built_in function-call counts, 1296 in all, are:
+= -- 114
+> -- 53
 < -- 0
-+ -- 15
-- -- 10
-* -- 41
-:= -- 168
-add.period$ -- 13
-call.type$ -- 5
-change.case$ -- 18
++ -- 22
+- -- 16
+* -- 53
+:= -- 214
+add.period$ -- 16
+call.type$ -- 6
+change.case$ -- 25
 chr.to.int$ -- 0
 cite$ -- 8
-duplicate$ -- 38
-empty$ -- 107
-format.name$ -- 10
-if$ -- 219
+duplicate$ -- 45
+empty$ -- 129
+format.name$ -- 16
+if$ -- 276
 int.to.chr$ -- 0
-int.to.str$ -- 5
+int.to.str$ -- 6
 missing$ -- 1
-newline$ -- 26
-num.names$ -- 8
-pop$ -- 47
+newline$ -- 31
+num.names$ -- 10
+pop$ -- 56
 preamble$ -- 1
-purify$ -- 15
+purify$ -- 20
 quote$ -- 0
-skip$ -- 35
+skip$ -- 44
 stack$ -- 0
-substring$ -- 25
-swap$ -- 4
+substring$ -- 30
+swap$ -- 5
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 20
-warning$ -- 3
-while$ -- 8
-width$ -- 6
-write$ -- 46
-(There were 8 warnings)
+type$ -- 24
+warning$ -- 2
+while$ -- 10
+width$ -- 7
+write$ -- 56
+(There were 3 warnings)

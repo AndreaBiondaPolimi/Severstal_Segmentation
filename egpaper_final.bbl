@@ -4,7 +4,8 @@
 Severstal: steel defect detection.
 
 \bibitem{FCNN}
-E.~S. Jonathan~Long and t.~.~F. Trevor~Darrell.
+E.~S. Jonathan~Long and T.~Darrell.
+\newblock Fully convolutional networks for semantic segmentation.
 \newblock 2015.
 \newblock https://arxiv.org/pdf/1411.4038.pdf.
 
@@ -24,5 +25,10 @@ E.~S. Jonathan~Long and t.~.~F. Trevor~Darrell.
 \newblock {U-Net: Convolutional Networks for Biomedical Image Segmentation},
   2015.
 \newblock https://arxiv.org/pdf/1505.04597.pdf.
+
+\bibitem{tversky}
+S.~S.~M. Salehi, D.~Erdogmus, and A.~Gholipour.
+\newblock Tversky loss function for image segmentation using 3d fully
+  convolutional deep networks, 2017.
 
 \end{thebibliography}
