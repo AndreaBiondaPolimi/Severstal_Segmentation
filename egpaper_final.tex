@@ -41,8 +41,8 @@ Politecnico di Milano\\
    It has been observed that the future of metallurgy requires the development of even more technological tools to face contemporary economic, ecological, and social challenges.
    The purpose of this paper is to provide a deep learning approach for the segmentation and classification of defects on steel sheets.\\
    The proposed solution is built focusing on two expected results: a precise defect segmentation and labelling, and an accurate classification between defective and non-defective images, in order to reduce false positives, and so waste of money and resources.\\
-   I will try to solve the above problem, using a combination of two famous deep learning approaches, named image classification and semantic segmentation respectively.
-   The evaluation metrics is the so called Dice coefficient, which is not only an accuracy index, but it also penalizes the false positives that the method finds, more similar to precision.
+   I will try to solve the above problem, using a combination of two famous deep learning approaches, named image classification and semantic segmentation, respectively.
+   The evaluation metrics is the so called Dice coefficient, which is not only an accuracy index, but it also penalizes the false positives found by the method, more similar to precision.
 
    \textcolor{blue}{
    The abstract should be self contained and explain what the paper is about. Usually abstracts are no longer than 300 words. You should state what are the main contributions of your work and tempt the reader to continue to read your paper. A good abstract briefly describes your problem, approach, and key results. This document is based on the CVPR submission template, and it has been adapted to submit a technical report of a project of the Deep Learning and Image Classification course.}
@@ -52,12 +52,12 @@ Politecnico di Milano\\
 %------------------------------------------------------------------------
 \graphicspath{ {./Resources/} }
 \section{Introduction}
-   In order to increase efficiency in production, Severstal collected gigabytes of data looking for a deep learning approach that helps them in the problem of recognize and classify automatically surface defects on steel sheets. The semantic segmentation aims to provide a label for each pixel in the image, in relation to this problem means assign one of the four defective class or the non-defective one to each pixel.\\
-   The main contribution of this paper is to present a method that provides a good tradeoff between accuracy on defect segmentation and precision in defective-image identification. The proposed solution takes in input images of steel sheet that come from high-frequency cameras and output the same-size segmented images, which contain the area of the defect(s) identified (if any) and the corresponding type. \\
-   The first explored approach is to use a single Fully Convolutional Neural Network that performs semantic segmentation over the four defects; in particular I have used the U-Net architecture. This method gives a Dice coefficient of 0.48 in the test set.
-   In order to improve precision, and so reducing false positives, the second approach is a pipeline of two different techniques: in the first stage, there is a Binary Classifier that is trained to filter out defect-free images; in the second stage, it is placed the segmentation model presented in the first method, that will segment only images that are labelled defective by the Classifier. This second approach gives a Dice coefficient of 0.71 in the test set.\\ 
-   The rationale behind the pipeline is to let the U-Net not worry about the possibility of identify false defects, that usually have a very similar pattern of real defects (Figure \ref{fig:result2}), in order to not reduce too much its segmentation ability; then training a classification model with the objective of find and filter out non-defective images.\\
-   The images come from real camera shot of steel sheets and can present 4 types of defects classified in: Pitting (Figure \ref{fig:defect1}), Inclusion (Figure \ref{fig:defect2}), Scratches (Figure \ref{fig:defect3}) and Corrosion (Figure \ref{fig:defect4}).
+   In order to increase efficiency in production, Severstal collected gigabytes of data looking for a deep learning approach that helps them in the problem of recognizing and classifying automatically surface defects on steel sheets. The semantic segmentation aims to provide a label for each pixel in the image, that in relation to this problem means to assign one of the four defective classes or the non-defective ones to each pixel.\\
+   The main contribution of this paper is to present a method which results to be a good tradeoff between accuracy on defect segmentation and precision in defective-image identification. The proposed solution takes in input images of steel sheets that come from high-frequency cameras and outputs the same-size segmented images, which contain the area of the identified defect(s) (if any) and the corresponding type. \\
+   The first explored approach is to use a single Fully Convolutional Neural Network that performs semantic segmentation over the four defects; in particular, I have used the U-Net architecture. This method gives a Dice coefficient of 0.48 in the test set.
+   In order to improve precision, and so to reduce false positives, the second approach is a pipeline of two different techniques: in the first stage, there is a Binary Classifier that is trained to filter out defect-free images; in the second stage, it is placed the segmentation model presented in the first method, that will segment only images that are labelled defective by the Classifier. This second approach gives a Dice coefficient of 0.71 in the test set.\\ 
+   The rationale behind the pipeline is not to let the U-Net worry about the possibility of identifying false defects, that usually have a very similar pattern compared to real defects (Figure \ref{fig:result2}), in order not to reduce its segmentation ability too much; then the idea follows with the training of a classification model with the purpose to find and filter out non-defective images.\\
+   The images come from real camera shots of steel sheets and can present 4 types of defects, classified in: Pitting (Figure \ref{fig:defect1}), Inclusion (Figure \ref{fig:defect2}), Scratches (Figure \ref{fig:defect3}) and Corrosion (Figure \ref{fig:defect4}).
    
    \begin{figure}[h]
       \centering
@@ -101,12 +101,12 @@ Politecnico di Milano\\
 \section{Related work}
    Since the output of the problem is a pixel-wise label for the input image, it is essentially a semantic segmentation task. In our case, it is also used a binary classifier to refine the results.
    \subsection{Residual Networks} 
-      This family of Convolutional Neural Network is built to face the degradation problem of very deep networks. The related paper proposes that such degradation is not caused by overfitting, but instead it is due to the well-known vanishing gradient issue. The main idea is to add an identity shortcut connection between blocks (group of convolutional layers), in such a way that each one learns features from both previous block and input value \cite{resnet}.
+      This family of Convolutional Neural Networks is built to face the degradation problem of very deep networks. The related paper proposes that such degradation is not caused by overfitting, but instead it is due to the well-known vanishing gradient issue. The main idea is to add an identity shortcut connection between blocks (group of convolutional layers), in such a way that each one learns features from both the previous block and the input value \cite{resnet}.
       In this paper, I will refer to ResNet34 and ResNet50, two models of the same family, but with different number of layers.
    \subsection{EfficientNet}
-      The idea behind this family of Convolutional Neural Network is to scale a baseline model, called EfficientNet-B0, in width, depth, and resolution by a costant ratio, in order to obtain higher accuracy. This process allows to keep the number of parameters lower than the one in same accuracy-level models \cite{efficientnet}. In the proposed solution, I will refer to EfficientNet-B3, a good tradeoff between accuracy level and network size.
+      The idea behind this family of Convolutional Neural Networks is to scale a baseline model, called EfficientNet-B0, in width, depth, and resolution by a costant ratio, in order to obtain higher accuracy. This process allows to keep the number of parameters lower than the one in same accuracy-level models \cite{efficientnet}. In the proposed solution, I will refer to EfficientNet-B3, a good tradeoff between accuracy level and network size.
    \subsection{U-Net}
-      The baseline architecture used in the segmentation phase is the so called U-Net, that is composed of two concatenated parts: the contracting path (or down-sampling network or encoder network) works as a classical Fully Convolutional Neural Network (FCNN) to extract meaningful feature from the image, while the expansive path (or up-sampling network or decoder network) builds a high resolution output starting from the feature extracted during the first phase. The biggest contribution taken by this architecture is that each up-sampling layer is enriched with features information extracted in the corresponding downsampling layer network, in order to achieve higher semantic levels \cite{Unet}. 
+      The baseline architecture used in the segmentation phase is the so called U-Net, that is composed of two concatenated parts: the contracting path (or down-sampling network or encoder network) works as a classical Fully Convolutional Neural Network (FCNN) to extract meaningful features from the image, while the expansive path (or up-sampling network or decoder network) builds a high resolution output, starting from the feature extracted during the first phase. The biggest contribution taken by this architecture is that each up-sampling layer is enriched with feature information extracted in the corresponding downsampling layer network, in order to achieve higher semantic levels \cite{Unet}. 
    
 
 \textcolor{blue}{
@@ -127,9 +127,9 @@ In this section you should discuss published work that relates to your project. 
       \includegraphics[scale=0.55]{Img_FirstApproach}
    \end{figure}
 
-   This method has a very good capibility in defect recognition, but at the same time it hardly distinguishes real defects from the false ones, due to their similar pattern (an example on Figure \ref{fig:result1} and \ref{fig:result2}). This problem is highly penalized in the case in which no defects are present with Dice metric \eqref{eq:dice_loss}, that could be reasonable in high capacity foundries, where the goal is also to reduce at minimum the false scrap and so the waste of resources (if the machine labels part of the steel sheet as defective, it will be thrown away).\\
+   This method has a very good capibility in defect recognition, but at the same time it hardly distinguishes real defects from the false ones, due to their similar pattern (an example on Figure \ref{fig:result1} and \ref{fig:result2}). This problem is highly penalized in the case in which no defects are present with Dice metrics \eqref{eq:dice_loss}, that could be reasonable in high capacity foundries, where the goal is also to reduce at minimum the false scrap and so the waste of resources (if the machine labels part of the steel sheet as defective, it will be thrown away).\\
    For this reason, the second proposed approach is to train a Binary classifier with the goal of distinguishing defective from non-defective images. The idea is to use the classifier to decide, during inference time, whether an image could contain a defect or not and, if the answer is true, to pass it to the U-Net to segment the defect, otherwise the segmentation inference is skipped and whole-zero masks are generated as heatmaps (Figure \ref{fig:secondApproach}).\\
-   This pipeline will reduce the false scrap and increase Dice coefficient, as it is presented in the result section (Table \ref{table:res_finals}.).
+   This pipeline will reduce the false scrap and increase the Dice coefficient, as it is presented in the result section (Table \ref{table:res_finals}.).
     
    \begin{figure}[h]
       \caption{Proposed approach: pipelined inference } \label{fig:secondApproach}
@@ -139,13 +139,13 @@ In this section you should discuss published work that relates to your project. 
 
    \subsection{Multiclass Semantic Segmentation}
    The semantic segmentation task is performed by a U-Net based model. In my experiments, I have tried three different U-Net encoders: ResNet34, ResNet50 and EfficientNet-B3. In the following, I will refer to the EfficientNet-B3 model only since it has given the best result (Table \ref{table:res_encoders}.).
-   The main advantage of using custom encoders is that it is possible to apply transfer-learning from pretrained weghts, allowing to transfer previous knowledge to the network. \\
+   The main advantage of using custom encoders is that it is possible to apply transfer-learning from pretrained weights, allowing to transfer previous knowledge to the network. \\
    The encoder part follows the EfficientNet-B3 architecture \cite{efficientnet}. The decoder part, instead, is a classical U-Net expansion path, where each upsampling layer is concatenated with the corresponding downsampling one in the contracting part, followed by a block of Convolution, Batch-Normalization and ReLu layer. \\
-   The decision about the right activation layer at the end of the network was a great challenge for quite a long time: even if Softmax is the straightforward choice for multiclass segmentation by definition, this means that I have to treat 'no Defect' pixels as a separate class altogether. In my opinion, this decision will stress even more the imbalanced data issue since for each pixel it is necessary to decide the right class, where, as I presented in the dataset analysis, it is clear that almost the entire amount of pixels belongs to the non-defective group. The usage of Sigmoid activation function, instead, brings the network to perform four \textit{one vs all} independent decisions, whether that pixel belongs to the corresponding class or not. The experiment results are inline with the above intuition (Table \ref{table:res_encoders})
+   The decision about the right activation layer at the end of the network was a great challenge for quite a long time: even if Softmax is the straightforward choice for multiclass segmentation by definition, this means that I have to treat 'no Defect' pixels as a separate class altogether. In my opinion, this decision will stress even more the imbalanced data issue, since for each pixel it is necessary to decide the right class, where, as I presented in the dataset analysis, it is clear that almost the entire amount of pixels belongs to the non-defective group. The usage of the Sigmoid activation function, instead, brings the network to perform four \textit{one vs all} independent decisions, whether that pixel belongs to the corresponding class or not. The experiment results are inline with the above intuition (Table \ref{table:res_encoders})
 
    \subsection{Binary Classification}
-   The classification task is delegated to a standard binary classifier. In my experiments I have tried two different models: ResNet34 and ResNet50. In the following, I will refer to ResNet50 only, because it has given the best result.
-   The structure of the classifier follows the classical ResNet50 architecture \cite{resnet}, the last part of Fully Connected layers is removed and replaced by a Global Averaging Pooling layer attached with a sigmoid activation over the single binary output.
+   The classification task is delegated to a standard binary classifier. In my experiments, I have tried two different models: ResNet34 and ResNet50. In the following, I will refer to ResNet50 only, because it has performed the best result.
+   The structure of the classifier follows the classical ResNet50 architecture \cite{resnet}, then the last part of Fully Connected layers is removed and replaced by a Global Averaging Pooling layer attached with a sigmoid activation over the single binary output.
 
 
 
@@ -187,13 +187,13 @@ zoom in to see tiny details on a graphic.}
 
 %------------------------------------------------------------------------
 \section{Experiments}
-   The entire pipeline is trained separately, so for legibility purpose I will divide the two experiments and then provide the final results using the Dice coefficient \eqref{eq:dice_loss}.
+   The entire pipeline is trained separately, so for a legibility purpose, I will divide the two experiments and then provide the final results using the Dice coefficient \eqref{eq:dice_loss}.
    \begin{equation}\label{eq:dice_loss}
       L_{dice} = \frac{2 * y_{pred} * y_{true}}{y_{pred} + y_{true}}
    \end{equation}
 
    \subsection{Dataset analysis}
-   The dataset is obtained from the corresponding Kaggle competition \cite{Severstal}, it is composed of 12568 greyscale images of size 1600x256x3 and their corresponding defective masks.
+   The dataset is obtained from the corresponding Kaggle competition \cite{Severstal}. It is composed of 12568 greyscale images of size 1600x256x3 and their corresponding defective masks.
    The dataset exhibits a fairly even distribution between defective (56\%) and non-defective images (44\%), but among the defective ones we can notice a strong imbalance between defect classes (Figure \ref{fig:classImbalance}). This distribution can lead to recognize only one type of defect (the third one), since it represents the largest part of the defective images.
    \begin{figure}[h]
       \centering
@@ -203,15 +203,15 @@ zoom in to see tiny details on a graphic.}
 
    \subsection{Segmentation}
       \paragraph{Data preparation}
-         The first operation applied is to crop the images due to the large dimension of the input data and the corresponding limited amount of memory. Thanks to the idea behind Fully Convolutional Neural Network, it is possible to train and predict on different image dimension with good output resolution \cite{FCNN}.
-         In order to apply a first level of data augmentation, the crop size varies on different epochs, also completely dark crops are prevented since does not bring any useful information.
-         In order to face imbalanced dataset issue, the batch is composed of all images' classes in equal proportion (included non-defective class).
+         The first operation applied is to crop the images due to the large dimensions of the input data and the corresponding limited amount of memory. Thanks to the idea behind Fully Convolutional Neural Network, it is possible to train and predict on different image dimensions with good output resolution \cite{FCNN}.
+         In order to apply a first level of data augmentation, the crop size varies on different epochs, also completely dark crops are prevented since they do not bring any useful information.
+         In order to face the imbalanced dataset issue, the batch is composed of all images' classes in equal proportion (included non-defective class).
 
       \paragraph{Training parameters}
          \begin{itemize}
             \item Data augmentation is applied with both random spatial transformations (flip, rotation and shifting) and color augmentation (brightness and contrast).
             \item The crop size used are (5, 256, 384) and (5, 256, 512) that will interchange on epochs, where the first number in the tuple identifies the batch size.
-            \item The loss function varies during the training: the first 70 epochs were trained using a balanced combination of two loss functions, Binary Cross Entropy and Dice \eqref{eq:dice_loss} that provides a tradeoff between accuracy and precision \eqref{eq:loss_bce_dice}. Finally the model is fine tuned for other 40 epochs using Tversky loss \eqref{eq:loss_tversky} with \textalpha=0.3 to reduce the false positive rate. In the cass of softmax activation function, the loss used is Categorical Cross Entropy working on channel axis.
+            \item The loss function varies during the training: the first 70 epochs were trained using a balanced combination of two loss functions, Binary Cross Entropy and Dice \eqref{eq:dice_loss}, that provides a tradeoff between accuracy and precision \eqref{eq:loss_bce_dice}. Finally, the model is fine tuned for other 40 epochs using Tversky loss \eqref{eq:loss_tversky} with \textalpha=0.3, to reduce the false positive rate. In the class of softmax activation function, the loss used is Categorical Cross Entropy working on channel axis.
             \begin{equation}\label{eq:loss_bce_dice}
                L_{bce\_dice} = L_{dice} + L_{bce}
             \end{equation}
@@ -242,13 +242,13 @@ zoom in to see tiny details on a graphic.}
             \label{table:res_encoders}
          \end{table}
 
-         As I mentioned before, U-Net provides a very accurate identification of defects, but hardly distinguishes real defects from false defects that usually are identified as small scarfs in the steel (Figure \ref{fig:result1}). 
+         As I mentioned before, U-Net provides a very accurate identification of defects, but hardly distinguishes real defects from the false ones, that usually are identified as small scarfs in the steel (Figure \ref{fig:result1}). 
          \begin{figure}[h]
             \centering
             \caption{Real (purple) vs False (blue) defects} \label{fig:result1}
             \includegraphics[scale=0.5]{Img_Result1.png}
          \end{figure}
-         \\This would not be a big issue if the challenges' metrics do not penalize so much false defects on non-defective images, even if they are a small proportion of the entire image(Figure \ref{fig:result2}).  
+         \\This would not be a big issue if the challenges' metrics does not penalize so much false defects on non-defective images, even if they are a small proportion of the entire image(Figure \ref{fig:result2}).  
          \begin{figure}[h]
             \centering
             \caption{False defects on good image} \label{fig:result2}
@@ -257,7 +257,7 @@ zoom in to see tiny details on a graphic.}
    
    \subsection{Classification}
       \paragraph{Data preparation} 
-         For classification, no data preprocessing is applied.
+         For the classification, no data preprocessing has been applied.
                  
       \paragraph{Training parameters}
       \begin{itemize}
@@ -303,7 +303,7 @@ zoom in to see tiny details on a graphic.}
          \end{table} 
          As it can be seen from the confusion matrix above, the classification helps to identify most of the non-defective images and avoid the segmentation step, that in some cases can create only problems. The most important thing here is to keep the False Negative rate as small as possible, in order not to skip the segmentation of defective images.
             
-   \subsection{Compelte pipeline}
+   \subsection{Complete pipeline}
       The training procedure of the entire pipeline is simply composed of the two procedures stated above.
       The following refers to the results coming from the two approaches, using EfficientNet-B3 as encoder model of the U-Net in the segmentation phase, and ResNet50 as binary classifier. 
       \begin{table}[h]
@@ -336,11 +336,11 @@ Discuss your results and compare with other methods. You can also perform an \em
 
 %-----------------------------------------------------------------------
 \section{Conclusion} 
-This project leverages the semantic segmentation and classification techniques to solve the steel defect detection problem. From the experiments arises that the combination of these two techniques works particularly well as a tradeoff between accuracy and precision, in this particualar field.\\
+This project leverages the semantic segmentation and classification techniques to solve the steel defect detection problem. From the experiments, it arises that the combination of these two techniques works particularly well as a tradeoff between accuracy and precision, in this particular field.\\
 Possible future improvements could be:
 \begin{itemize}
-   \item Try ensamble learning in order to exploit different encoder models' capability.
-   \item Fitht imabalanced dataset issue using a custom loss that takes in consideration the defect class distribution.
+   \item Try ensemble learning, in order to exploit the capability of different encoder models.
+   \item Fight the imbalanced dataset issue using a custom loss that takes in consideration the defect class distribution.
 \end{itemize}
 
 \textcolor{blue}{
